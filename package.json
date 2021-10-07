@@ -1,0 +1,33 @@
+{
+  "name": "cypress-testrail-simple",
+  "version": "1.0.0",
+  "description": "Simple upload of Cypress test results to TestRail",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bahmutov/cypress-testrail-simple.git"
+  },
+  "keywords": [
+    "cypress",
+    "testrail",
+    "plugin",
+    "reporter",
+    "cypress-plugin"
+  ],
+  "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bahmutov/cypress-testrail-simple/issues"
+  },
+  "homepage": "https://github.com/bahmutov/cypress-testrail-simple#readme",
+  "devDependencies": {
+    "cypress": "^8.5.0"
+  },
+  "dependencies": {
+    "arg": "^5.0.1",
+    "got": "^11.8.2"
+  }
+}
