@@ -14,7 +14,12 @@ jobs:
           runTests: false
 
       - name: Start TestRail Run 🏃🏻‍♂️
-        run: node ./bin/testrail-run.js
+        id: testRail
+        run: |
+          runId=node ./bin/testrail-run.js
+          echo "TestRail run id ${runId}"
+          # save the run ID as the output from this step
+          echo "::set-output name=runId::${runId}"
 
       - name: Semantic Release 🚀
         uses: cycjimmy/semantic-release-action@v2

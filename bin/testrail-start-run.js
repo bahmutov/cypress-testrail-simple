@@ -30,20 +30,32 @@ debug('%o', { ...testRailInfo, password: '***' })
 console.log('creatig new TestRail run for project %s', testRailInfo.projectId)
 const addRunUrl = `${testRailInfo.host}/index.php?/api/v2/add_run/${testRailInfo.projectId}`
 debug('add run url: %s', addRunUrl)
+const authorization = `Basic ${Buffer.from(
+  `${testRailInfo.username}:${testRailInfo.password}`,
+).toString('base64')}`
 // @ts-ignore
-got
-  .post(addRunUrl, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    auth: {
-      username: testRailInfo.username,
-      password: testRailInfo.password,
-    },
-  })
+got(addRunUrl, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    authorization,
+  },
+  json: {
+    name: 'Started run',
+    description: 'Checking...',
+  },
+})
+  .json()
   .then(
-    (response) => {
-      console.log(response)
+    (json) => {
+      debug('response from the add_run')
+      debug('%o', json)
+      // we are only interested in the run id
+      if (!json.id) {
+        console.error(json)
+        throw new Error('no id in the response')
+      }
+      console.log(json.id)
     },
     (error) => {
       console.error(error)

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Simple upload of Cypress test results to TestRail",
   "main": "index.js",
+  "files": [
+    "bin"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
