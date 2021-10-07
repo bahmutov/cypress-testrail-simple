@@ -1,10 +1,12 @@
 // @ts-check
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
+const fs = require('fs')
 const {
   hasConfig,
   getTestRailConfig,
   getAuthorization,
+  getTestRunId,
 } = require('../src/get-config')
 
 async function sendTestResults(testRailInfo, runId, testResults) {
@@ -38,6 +40,7 @@ function registerPlugin(on, config) {
   }
 
   const testRailInfo = getTestRailConfig()
+
   if (!process.env.TESTRAIL_RUN_ID) {
     throw new Error('Missing test rail id TESTRAIL_RUN_ID')
   }

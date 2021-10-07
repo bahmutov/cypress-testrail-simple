@@ -1,4 +1,6 @@
 // @ts-check
+const fs = require('fs')
+
 function hasConfig(env = process.env) {
   return (
     'TESTRAIL_HOST' in env ||
@@ -44,4 +46,20 @@ function getAuthorization(testRailInfo) {
   return authorization
 }
 
-module.exports = { hasConfig, getTestRailConfig, getAuthorization }
+function getTestRunId(env = process.env) {
+  // first, try to read the test run id from the environment
+  if ('TESTRAIL_RUN_ID' in env) {
+    return parseInt(env.TESTRAIL_RUN_ID)
+  }
+
+  if (fs.existsSync('./runId.txt')) {
+    return parseInt(fs.readFileSync('./runId.txt', 'utf8').trim())
+  }
+}
+
+module.exports = {
+  hasConfig,
+  getTestRailConfig,
+  getAuthorization,
+  getTestRunId,
+}

@@ -12,7 +12,32 @@ workflows:
       - cypress/install:
           # instead of building the application
           # or in addition to it, start a new TestRail run
+          # and save the run ID in a text file - it will be passed
+          # to other CircleCI jobs via workspace together with the other files
           build: |
-            node ./bin/testrail-start-run.js \
+            runID=$(node ./bin/testrail-start-run.js \
               "Testing Circle workflow ${CIRCLE_WORKFLOW_ID}" \
-              "Cypress tests on CircleCI ${CIRCLE_BUILD_URL}"
+              "Cypress tests on CircleCI ${CIRCLE_BUILD_URL}")
+            echo "TestRail run id ${runId}"
+            echo ${runId} > runId.txt
+
+      # cypress-testrail-simple automatically tries to read
+      # the TestRail run ID from the file runId.txt
+      - cypress/run:
+          requires:
+            - cypress/install
+          record: true
+          parallel: true
+          parallelism: 2
+          group: CircleCI
+
+      # once all tests are finished, closed the TestRail run
+      - cypress/run:
+          name: Close TestRail Run
+          requires:
+            - cypress/install
+            - cypress/run
+          install-command: echo 'Nothing to install in this job'
+          no-workspace: true
+          # instead of "cypress run" call the script to close the TestRail run
+          command: node ./bin/testrail-close-run.js

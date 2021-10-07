@@ -38,6 +38,7 @@ jobs:
         with:
           install-command: echo "Already installed"
           record: true
+          group: GitHub Actions
         env:
           TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.runId }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
