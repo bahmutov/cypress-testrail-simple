@@ -37,8 +37,10 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           install-command: echo "Already installed"
+          record: true
         env:
           TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.runId }}
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
       - name: Close TestRail Run 🏁
         run: |

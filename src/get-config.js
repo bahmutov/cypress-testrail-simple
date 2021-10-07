@@ -1,3 +1,13 @@
+// @ts-check
+function hasConfig(env = process.env) {
+  return (
+    'TESTRAIL_HOST' in env ||
+    'TESTRAIL_USERNAME' in env ||
+    'TESTRAIL_PASSWORD' in env ||
+    'TESTRAIL_PROJECTID' in env
+  )
+}
+
 function getTestRailConfig(env = process.env) {
   const debug = require('debug')('cypress-testrail-simple')
   const got = require('got')
@@ -34,4 +44,4 @@ function getAuthorization(testRailInfo) {
   return authorization
 }
 
-module.exports = { getTestRailConfig, getAuthorization }
+module.exports = { hasConfig, getTestRailConfig, getAuthorization }

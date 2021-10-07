@@ -1,7 +1,11 @@
 // @ts-check
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
-const { getTestRailConfig, getAuthorization } = require('../src/get-config')
+const {
+  hasConfig,
+  getTestRailConfig,
+  getAuthorization,
+} = require('../src/get-config')
 
 async function sendTestResults(testRailInfo, runId, testResults) {
   debug(
@@ -28,7 +32,11 @@ async function sendTestResults(testRailInfo, runId, testResults) {
 }
 
 function registerPlugin(on, config) {
-  // TODO: do not fail if the env variables are not set
+  if (!hasConfig(process.env)) {
+    debug('cypress-testrail-simple env variables are not set')
+    return
+  }
+
   const testRailInfo = getTestRailConfig()
   if (!process.env.TESTRAIL_RUN_ID) {
     throw new Error('Missing test rail id TESTRAIL_RUN_ID')
