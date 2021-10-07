@@ -46,6 +46,7 @@ function registerPlugin(on, config) {
 
   // should we ignore test results if running in the interactive mode?
   // right now these callbacks only happen in the non-interactive mode
+
   // https://on.cypress.io/after-spec-api
   on('after:spec', (spec, results) => {
     debug('after:spec')

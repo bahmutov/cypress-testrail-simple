@@ -1,0 +1,16 @@
+version: 2.1
+orbs:
+  # https://github.com/cypress-io/circleci-orb
+  cypress: cypress-io/cypress@1
+
+workflows:
+  build:
+    jobs:
+      # every testing job needs to install dependencies and Cypress
+      - cypress/install:
+          # instead of building the application
+          # or in addition to it, start a new TestRail run
+          build: |
+            node ./bin/testrail-start-run.js \
+              "Testing Circle workflow ${CIRCLE_WORKFLOW_ID}" \
+              "Cypress tests on CircleCI ${CIRCLE_BUILD_URL}"
