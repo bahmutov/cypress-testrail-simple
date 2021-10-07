@@ -9,7 +9,8 @@ jobs:
       TESTRAIL_HOST: ${{secrets.TESTRAIL_HOST}}
       TESTRAIL_USERNAME: ${{secrets.TESTRAIL_USERNAME}}
       TESTRAIL_PASSWORD: ${{secrets.TESTRAIL_PASSWORD}}
-      TESTRAIL_PROJECTID: ${{secrets.TESTRAIL_PROJECTID}}
+      # the project ID is not that secret
+      TESTRAIL_PROJECTID: 1
 
     steps:
       - name: Checkout 🛎
