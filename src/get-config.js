@@ -1,4 +1,5 @@
 // @ts-check
+const debug = require('debug')('cypress-testrail-simple')
 const fs = require('fs')
 
 function hasConfig(env = process.env) {
@@ -55,6 +56,7 @@ function getTestRunId(env = process.env) {
   if (fs.existsSync('./runId.txt')) {
     return parseInt(fs.readFileSync('./runId.txt', 'utf8').trim())
   }
+  debug('could not find runId.txt in folder %s', process.cwd())
 }
 
 module.exports = {
