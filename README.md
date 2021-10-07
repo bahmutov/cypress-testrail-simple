@@ -1,4 +1,5 @@
-# cypress-testrail-simple ![cypress version](https://img.shields.io/badge/cypress-8.5.0-brightgreen)
+# cypress-testrail-simple
+[![cypress-testrail-simple](https://img.shields.io/endpoint?url=https://dashboard.cypress.io/badge/simple/41cgid/main&style=flat&logo=cypress)](https://dashboard.cypress.io/projects/41cgid/runs) [![ci](https://github.com/bahmutov/cypress-testrail-simple/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bahmutov/cypress-testrail-simple/actions/workflows/ci.yml) ![cypress version](https://img.shields.io/badge/cypress-8.5.0-brightgreen)
 > Simple upload of Cypress test results to TestRail
 
 ## Debugging
