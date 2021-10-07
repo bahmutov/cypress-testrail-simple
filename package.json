@@ -4,6 +4,7 @@
   "description": "Simple upload of Cypress test results to TestRail",
   "main": "index.js",
   "files": [
+    "src",
     "bin"
   ],
   "scripts": {
