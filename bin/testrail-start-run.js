@@ -4,7 +4,7 @@
 
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
-const { getTestRailConfig } = require('../src/get-config')
+const { getTestRailConfig, getAuthorization } = require('../src/get-config')
 
 // optional arguments
 const name = process.argv[2]
@@ -19,9 +19,7 @@ console.error(
 )
 const addRunUrl = `${testRailInfo.host}/index.php?/api/v2/add_run/${testRailInfo.projectId}`
 debug('add run url: %s', addRunUrl)
-const authorization = `Basic ${Buffer.from(
-  `${testRailInfo.username}:${testRailInfo.password}`,
-).toString('base64')}`
+const authorization = getAuthorization(testRailInfo)
 // @ts-ignore
 got(addRunUrl, {
   method: 'POST',

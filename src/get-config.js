@@ -27,4 +27,11 @@ function getTestRailConfig(env = process.env) {
   return testRailInfo
 }
 
-module.exports = { getTestRailConfig }
+function getAuthorization(testRailInfo) {
+  const authorization = `Basic ${Buffer.from(
+    `${testRailInfo.username}:${testRailInfo.password}`,
+  ).toString('base64')}`
+  return authorization
+}
+
+module.exports = { getTestRailConfig, getAuthorization }

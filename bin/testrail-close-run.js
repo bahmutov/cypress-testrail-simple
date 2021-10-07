@@ -4,7 +4,7 @@
 
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
-const { getTestRailConfig } = require('../src/get-config')
+const { getTestRailConfig, getAuthorization } = require('../src/get-config')
 
 const runIdStr = process.argv[2]
 if (!runIdStr) {
@@ -28,9 +28,8 @@ console.log(
 )
 const closeRunUrl = `${testRailInfo.host}/index.php?/api/v2/close_run/${runId}`
 debug('close run url: %s', closeRunUrl)
-const authorization = `Basic ${Buffer.from(
-  `${testRailInfo.username}:${testRailInfo.password}`,
-).toString('base64')}`
+const authorization = getAuthorization(testRailInfo)
+
 // @ts-ignore
 got(closeRunUrl, {
   method: 'POST',

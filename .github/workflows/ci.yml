@@ -21,15 +21,23 @@ jobs:
         with:
           runTests: false
 
+      # you can pass GitHub information in the name and description
+      # to include in the TestRail run information
+      # https://docs.github.com/en/actions/learn-github-actions/contexts
       - name: Start TestRail Run 🏃🏻‍♂️
         id: testRail
         run: |
-          runId=$(node ./bin/testrail-start-run.js ${{ github.sha }} 'Cypress tests')
+          runId=$(node ./bin/testrail-start-run.js 'Testing commit ${{ github.sha }}' 'Cypress tests')
           echo "TestRail run id ${runId}"
           # save the run ID as the output from this step
           echo "::set-output name=runId::${runId}"
 
-      # TODO: run Cypress tests
+      - name: Cypress tests 🧪
+        uses: cypress-io/github-action@v2
+        with:
+          install-command: echo "Already installed"
+        env:
+          TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.runId }}
 
       - name: Close TestRail Run 🏁
         run: |
