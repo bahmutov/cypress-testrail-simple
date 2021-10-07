@@ -7,6 +7,10 @@
     "src",
     "bin"
   ],
+  "bin": {
+    "testrail-close-run": "bin/testrail-close-run.js",
+    "testrail-start-run": "bin/testrail-start-run.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "semantic-release": "semantic-release"
