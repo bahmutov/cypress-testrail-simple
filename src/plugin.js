@@ -40,12 +40,10 @@ function registerPlugin(on, config) {
   }
 
   const testRailInfo = getTestRailConfig()
-
-  if (!process.env.TESTRAIL_RUN_ID) {
-    throw new Error('Missing test rail id TESTRAIL_RUN_ID')
+  const runId = getTestRunId()
+  if (!runId) {
+    throw new Error('Missing test rail run ID')
   }
-
-  const runId = parseInt(process.env.TESTRAIL_RUN_ID)
 
   // should we ignore test results if running in the interactive mode?
   // right now these callbacks only happen in the non-interactive mode
