@@ -41,6 +41,7 @@ jobs:
         env:
           TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.runId }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          DEBUG: cypress-testrail-simple
 
       - name: Close TestRail Run 🏁
         run: |
