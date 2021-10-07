@@ -1,6 +1,6 @@
 {
   "name": "cypress-testrail-simple",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "description": "Simple upload of Cypress test results to TestRail",
   "main": "index.js",
   "files": [
@@ -8,11 +8,12 @@
     "bin"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bahmutov/cypress-testrail-simple.git"
+    "url": "https://github.com/bahmutov/cypress-testrail-simple.git"
   },
   "keywords": [
     "cypress",
@@ -28,10 +29,10 @@
   },
   "homepage": "https://github.com/bahmutov/cypress-testrail-simple#readme",
   "devDependencies": {
-    "cypress": "^8.5.0"
+    "cypress": "^8.5.0",
+    "semantic-release": "^18.0.0"
   },
   "dependencies": {
-    "arg": "^5.0.1",
     "debug": "^4.3.2",
     "got": "^11.8.2"
   }

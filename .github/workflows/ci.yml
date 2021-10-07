@@ -16,10 +16,16 @@ jobs:
       - name: Start TestRail Run 🏃🏻‍♂️
         id: testRail
         run: |
-          runId=node ./bin/testrail-run.js
+          runId=node ./bin/testrail-start-run.js
           echo "TestRail run id ${runId}"
           # save the run ID as the output from this step
           echo "::set-output name=runId::${runId}"
+
+      # TODO: run Cypress tests
+
+      - name: Close TestRail Run 🏁
+        run: |
+          node ./bin/testrail-close-run.js ${{ steps.testRail.outputs.runId }}
 
       - name: Semantic Release 🚀
         uses: cycjimmy/semantic-release-action@v2
