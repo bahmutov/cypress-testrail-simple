@@ -8,9 +8,13 @@ jobs:
         uses: actions/checkout@v2
 
       # Install NPM dependencies, cache them correctly
-      # and run all Cypress tests
-      - name: Cypress tests 🧪
+      - name: Install 📦
         uses: cypress-io/github-action@v2
+        with:
+          runTests: false
+
+      - name: Start TestRail Run 🏃🏻‍♂️
+        run: node ./bin/testrail-run.js
 
       - name: Semantic Release 🚀
         uses: cycjimmy/semantic-release-action@v2
