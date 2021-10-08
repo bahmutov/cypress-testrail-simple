@@ -45,16 +45,3 @@ workflows:
                 name: Close TestRail Run
                 when: always
                 command: node ./bin/testrail-close-run.js
-
-      # # once all tests are finished, closed the TestRail run
-      # - cypress/run:
-      #     name: Close TestRail Run
-      #     requires:
-      #       - cypress/install
-      #       - cypress/run
-      #     # install-command: echo 'Nothing to install in this job'
-      #     # print the file with the TestRail run ID
-      #     install-command: ls -la && cat runId.txt
-      #     no-workspace: true
-      #     # instead of "cypress run" call the script to close the TestRail run
-      #     command: node ./bin/testrail-close-run.js
