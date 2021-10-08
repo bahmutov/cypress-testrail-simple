@@ -11,4 +11,8 @@ describe('parent2', () => {
       // cy.wrap(false).should('be.true')
     })
   })
+
+  it('tests C103 regression', () => {
+    cy.wait(10000)
+  })
 })
