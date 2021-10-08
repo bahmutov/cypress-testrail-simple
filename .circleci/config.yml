@@ -15,11 +15,13 @@ workflows:
           # and save the run ID in a text file - it will be passed
           # to other CircleCI jobs via workspace together with the other files
           build: |
-            runID=$(node ./bin/testrail-start-run.js \
+            runId=$(node ./bin/testrail-start-run.js \
               "Testing Circle workflow ${CIRCLE_WORKFLOW_ID}" \
               "Cypress tests on CircleCI ${CIRCLE_BUILD_URL}")
             echo "TestRail run id ${runId}"
             echo ${runId} > runId.txt
+            echo "Saved file runId.txt"
+            cat runId.txt
 
       # cypress-testrail-simple automatically tries to read
       # the TestRail run ID from the file runId.txt
@@ -27,10 +29,10 @@ workflows:
           requires:
             - cypress/install
           install-command: ls -la && cat runId.txt
-          # record: true
-          # parallel: true
-          # parallelism: 2
-          # group: CircleCI
+          record: true
+          parallel: true
+          parallelism: 2
+          group: CircleCI
 
       # once all tests are finished, closed the TestRail run
       - cypress/run:
