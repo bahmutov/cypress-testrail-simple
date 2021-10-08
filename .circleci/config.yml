@@ -35,16 +35,25 @@ workflows:
           parallel: true
           parallelism: 2
           group: CircleCI
+          # try to close the TestRail run using job's post-steps
+          # https://circleci.com/docs/2.0/configuration-reference/
+          # not that the close script first checks if there are any
+          # remaining untested cases. Only when the untested count is 0
+          # then the TestRail run is closed
+          post-steps:
+            - run:
+                name: Close TestRail Run
+                command: node ./bin/testrail-close-run.js
 
-      # once all tests are finished, closed the TestRail run
-      - cypress/run:
-          name: Close TestRail Run
-          requires:
-            - cypress/install
-            - cypress/run
-          # install-command: echo 'Nothing to install in this job'
-          # print the file with the TestRail run ID
-          install-command: ls -la && cat runId.txt
-          no-workspace: true
-          # instead of "cypress run" call the script to close the TestRail run
-          command: node ./bin/testrail-close-run.js
+      # # once all tests are finished, closed the TestRail run
+      # - cypress/run:
+      #     name: Close TestRail Run
+      #     requires:
+      #       - cypress/install
+      #       - cypress/run
+      #     # install-command: echo 'Nothing to install in this job'
+      #     # print the file with the TestRail run ID
+      #     install-command: ls -la && cat runId.txt
+      #     no-workspace: true
+      #     # instead of "cypress run" call the script to close the TestRail run
+      #     command: node ./bin/testrail-close-run.js
