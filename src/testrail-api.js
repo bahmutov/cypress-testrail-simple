@@ -4,6 +4,25 @@ const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
 const { getAuthorization } = require('./get-config')
 
+async function getTestRun(runId, testRailInfo) {
+  const closeRunUrl = `${testRailInfo.host}/index.php?/api/v2/get_run/${runId}`
+  debug('get run url: %s', closeRunUrl)
+  const authorization = getAuthorization(testRailInfo)
+
+  // @ts-ignore
+  const json = await got(closeRunUrl, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization,
+    },
+  }).json()
+
+  debug('get test run %d response', runId)
+  debug(json)
+  return json
+}
+
 async function closeTestRun(runId, testRailInfo) {
   console.log(
     'closing the TestRail run %d for project %s',
@@ -32,4 +51,4 @@ async function closeTestRun(runId, testRailInfo) {
   return json
 }
 
-module.exports = { closeTestRun }
+module.exports = { getTestRun, closeTestRun }
