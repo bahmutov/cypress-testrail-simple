@@ -26,7 +26,7 @@ workflows:
       - cypress/run:
           requires:
             - cypress/install
-          install-command: ls -la
+          install-command: ls -la && cat runId.txt
           # record: true
           # parallel: true
           # parallelism: 2
