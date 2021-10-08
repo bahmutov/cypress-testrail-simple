@@ -45,6 +45,8 @@ jobs:
           # DEBUG: cypress-testrail-simple
 
       - name: Close TestRail Run 🏁
+        # always close the test run, even if the previous steps have failed
+        if: ${{ always() }}
         run: |
           node ./bin/testrail-close-run.js ${{ steps.testRail.outputs.runId }}
 
