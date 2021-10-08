@@ -35,14 +35,15 @@ workflows:
           parallel: true
           parallelism: 2
           group: CircleCI
-          # try to close the TestRail run using job's post-steps
+          # Try to close the TestRail run using job's post-steps
           # https://circleci.com/docs/2.0/configuration-reference/
-          # not that the close script first checks if there are any
+          # Note that the close script first checks if there are any
           # remaining untested cases. Only when the untested count is 0
-          # then the TestRail run is closed
+          # then the TestRail run is closed.
           post-steps:
             - run:
                 name: Close TestRail Run
+                when: always
                 command: node ./bin/testrail-close-run.js
 
       # # once all tests are finished, closed the TestRail run
