@@ -33,7 +33,7 @@ jobs:
       - name: Start TestRail Run 🏃🏻‍♂️
         id: testRail
         run: |
-          commitSubject=$(git show --format="%s" --no-patch)
+          commitSubject=${{ github.event.commits[0].message }}
           runName=Testing on GitHub Actions: ${commitSubject}
           runDescription=Cypress tests for commit ${GITHUB_SHA} ${GITHUB_REF}
           runId=$(node ./bin/testrail-start-run.js '${runName}' '${runDescription}')
