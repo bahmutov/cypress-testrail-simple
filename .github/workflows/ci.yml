@@ -28,7 +28,10 @@ jobs:
       - name: Start TestRail Run 🏃🏻‍♂️
         id: testRail
         run: |
-          runId=$(node ./bin/testrail-start-run.js 'Testing commit ${{ github.sha }}' 'Cypress tests')
+          commitSubject=$(git show --format="%s" --no-patch)
+          runName=Testing on GitHub Actions: ${commitSubject}
+          runDescription=Cypress tests for commit ${GITHUB_SHA} ${GITHUB_REF}
+          runId=$(node ./bin/testrail-start-run.js '${runName}' '${runDescription}')
           echo "TestRail run id ${runId}"
           # save the run ID as the output from this step
           echo "::set-output name=runId::${runId}"
