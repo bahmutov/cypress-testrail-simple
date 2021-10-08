@@ -16,7 +16,7 @@ workflows:
           # to other CircleCI jobs via workspace together with the other files
           build: |
             runId=$(node ./bin/testrail-start-run.js \
-              "Testing on Circle ${CIRCLE_WORKFLOW_ID}" \
+              "Testing on Circle workflow ${CIRCLE_WORKFLOW_ID}" \
               "Cypress tests on CircleCI ${CIRCLE_BUILD_URL}")
             echo "TestRail run id ${runId}"
             echo ${runId} > runId.txt
