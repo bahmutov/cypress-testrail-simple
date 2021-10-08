@@ -8,7 +8,7 @@ describe('parent2', () => {
     it('C15 works', () => {
       cy.wait(15000)
       // uncomment to fail test
-      cy.wrap(false).should('be.true')
+      // cy.wrap(false).should('be.true')
     })
   })
 })
