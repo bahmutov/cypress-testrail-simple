@@ -36,7 +36,7 @@ jobs:
       - name: Cypress tests 🧪
         uses: cypress-io/github-action@v2
         with:
-          install-command: ls -la
+          install-command: echo "Already installed"
           record: true
           group: GitHub Actions
         env:

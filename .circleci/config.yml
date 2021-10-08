@@ -26,10 +26,11 @@ workflows:
       - cypress/run:
           requires:
             - cypress/install
-          record: true
-          parallel: true
-          parallelism: 2
-          group: CircleCI
+          install-command: ls -la
+          # record: true
+          # parallel: true
+          # parallelism: 2
+          # group: CircleCI
 
       # once all tests are finished, closed the TestRail run
       - cypress/run:
