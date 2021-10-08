@@ -13,6 +13,11 @@ jobs:
       TESTRAIL_PROJECTID: 1
 
     steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
       - name: Checkout 🛎
         uses: actions/checkout@v2
 
