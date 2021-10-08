@@ -4,16 +4,24 @@
 
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
-const { getTestRailConfig, getAuthorization } = require('../src/get-config')
+const {
+  getTestRunId,
+  getTestRailConfig,
+  getAuthorization,
+} = require('../src/get-config')
 
+let runId
 const runIdStr = process.argv[2]
 if (!runIdStr) {
-  console.error('Usage: testrail-close-run.js <runId>')
-  process.exit(1)
+  debug('TestRail run id not passed via CLI, trying the file')
+  runId = getTestRunId()
+} else {
+  runId = parseInt(runIdStr, 10)
 }
-const runId = parseInt(runIdStr, 10)
+
 if (!runId) {
   console.error('Usage: testrail-close-run.js <number runId>')
+  console.error('or pass it in the file runId.txt')
   process.exit(1)
 }
 

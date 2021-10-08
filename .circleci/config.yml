@@ -28,6 +28,8 @@ workflows:
       - cypress/run:
           requires:
             - cypress/install
+          # install-command: echo 'Nothing to install in this job'
+          # print the file with the TestRail run ID
           install-command: ls -la && cat runId.txt
           record: true
           parallel: true
@@ -40,7 +42,9 @@ workflows:
           requires:
             - cypress/install
             - cypress/run
-          install-command: echo 'Nothing to install in this job'
+          # install-command: echo 'Nothing to install in this job'
+          # print the file with the TestRail run ID
+          install-command: ls -la && cat runId.txt
           no-workspace: true
           # instead of "cypress run" call the script to close the TestRail run
           command: node ./bin/testrail-close-run.js
