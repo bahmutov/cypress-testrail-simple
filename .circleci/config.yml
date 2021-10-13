@@ -67,6 +67,7 @@ workflows:
             cat runId.txt
           record: true
           group: CircleCI Some Specs
+          spec: 'cypress/integration/spec-a.js'
           # this is the only job in the workflow, no need to save the files
           no-workspace: true
           # Try to close the TestRail run using job's post-steps

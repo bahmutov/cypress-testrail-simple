@@ -43,6 +43,10 @@ function startRun({ testRailInfo, name, description, caseIds }) {
     'creating new TestRail run for project %s',
     testRailInfo.projectId,
   )
+  if (caseIds && caseIds.length > 0) {
+    console.error('With %d case IDs', caseIds.length)
+  }
+
   const addRunUrl = `${testRailInfo.host}/index.php?/api/v2/add_run/${testRailInfo.projectId}`
   debug('add run url: %s', addRunUrl)
   const authorization = getAuthorization(testRailInfo)
