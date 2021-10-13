@@ -52,8 +52,10 @@ function startRun({ testRailInfo, name, description, caseIds }) {
     description,
   }
   if (caseIds && caseIds.length > 0) {
+    json.include_all = false
     json.case_ids = caseIds
   }
+  debug('add run params %o', json)
 
   // @ts-ignore
   return got(addRunUrl, {
