@@ -7,6 +7,7 @@ const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
 const globby = require('globby')
 const { getTestRailConfig, getAuthorization } = require('../src/get-config')
+const { findCases } = require('../src/find-cases')
 
 const args = arg(
   {
@@ -36,7 +37,7 @@ function findSpecs(pattern) {
   })
 }
 
-function startRun(testRailInfo, name, description) {
+function startRun({ testRailInfo, name, description, caseIds }) {
   // only output the run ID to the STDOUT, everything else is logged to the STDERR
   console.error(
     'creating new TestRail run for project %s',
@@ -45,6 +46,15 @@ function startRun(testRailInfo, name, description) {
   const addRunUrl = `${testRailInfo.host}/index.php?/api/v2/add_run/${testRailInfo.projectId}`
   debug('add run url: %s', addRunUrl)
   const authorization = getAuthorization(testRailInfo)
+
+  const json = {
+    name,
+    description,
+  }
+  if (caseIds && caseIds.length > 0) {
+    json.case_ids = caseIds
+  }
+
   // @ts-ignore
   return got(addRunUrl, {
     method: 'POST',
@@ -52,28 +62,33 @@ function startRun(testRailInfo, name, description) {
       'Content-Type': 'application/json',
       authorization,
     },
-    json: {
-      name,
-      description,
-    },
-  }).json()
+    json,
+  })
+    .json()
+    .then(
+      (json) => {
+        debug('response from the add_run')
+        debug('%o', json)
+        console.log(json.id)
+      },
+      (error) => {
+        console.error(error)
+        process.exit(1)
+      },
+    )
 }
 
 if (args['--spec']) {
   findSpecs(args['--spec']).then((specs) => {
     debug('using pattern "%s" found specs', args['--spec'])
     debug(specs)
+    const caseIds = findCases(specs)
+    debug('found TestRail case ids: %o', caseIds)
+
+    startRun({ testRailInfo, name, description, caseIds })
   })
 } else {
-  startRun(testRailInfo, name, description).then(
-    (json) => {
-      debug('response from the close_run')
-      debug('%o', json)
-      console.log(json.id)
-    },
-    (error) => {
-      console.error(error)
-      process.exit(1)
-    },
-  )
+  // start a new test run for all test cases
+  // @ts-ignore
+  startRun({ testRailInfo, name, description })
 }
