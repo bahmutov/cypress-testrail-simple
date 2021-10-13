@@ -62,13 +62,3 @@ jobs:
         if: ${{ always() }}
         run: |
           node ./bin/testrail-close-run.js ${{ steps.testRail.outputs.runId }}
-
-      - name: Semantic Release 🚀
-        uses: cycjimmy/semantic-release-action@v2
-        with:
-          branches: main
-        env:
-          # github token is automatically created by the GH Action workflow
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # created using semantic-release
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
