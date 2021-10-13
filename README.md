@@ -65,10 +65,20 @@ npx testrail-start-run > runId.txt
 
 - `--name` optional name for the test run, alias `-n`
 - `--description` optional description for the test run, alias `-d`
+- `--spec` optional [globby](https://github.com/sindresorhus/globby#readme) pattern for finding specs, extracting case IDs (using the `C\d+` regular expression), and starting a new TestRail run with those case IDs only. Alias `-s`. This option is very useful if only some test cases are automated using Cypress. See the workflow examples in [.github/workflows/cases.yml](./.github/workflows/cases.yml) and [.circleci/config.yml](./.circleci/config.yml).
 
 ```
 npx testrail-start-run --name "test run" --description "test run description"
 # prints the run id
+```
+
+For readability, you can split the command across multiple lines usually
+
+```
+npx testrail-start-run \
+  --name "test run" \
+  --description "test run description" \
+  --spec "cypress/integration/featureA/**.js"
 ```
 
 ### testrail-close-run
