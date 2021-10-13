@@ -28,8 +28,6 @@ debug('args: %o', args)
 debug('run name: %s', name)
 debug('run description: %s', description)
 
-const testRailInfo = getTestRailConfig()
-
 function findSpecs(pattern) {
   // @ts-ignore
   return globby(pattern, {
@@ -91,9 +89,11 @@ if (args['--spec']) {
     const caseIds = findCases(specs)
     debug('found TestRail case ids: %o', caseIds)
 
+    const testRailInfo = getTestRailConfig()
     startRun({ testRailInfo, name, description, caseIds })
   })
 } else {
+  const testRailInfo = getTestRailConfig()
   // start a new test run for all test cases
   // @ts-ignore
   startRun({ testRailInfo, name, description })
