@@ -6,7 +6,8 @@ orbs:
 # setting environment variables on CircleCI
 # https://circleci.com/docs/2.0/env-vars/
 workflows:
-  build:
+  # runs through all the specs
+  test-all:
     jobs:
       # every testing job needs to install dependencies and Cypress
       - cypress/install:
@@ -35,6 +36,37 @@ workflows:
           parallel: true
           parallelism: 2
           group: CircleCI
+          # Try to close the TestRail run using job's post-steps
+          # https://circleci.com/docs/2.0/configuration-reference/
+          # Note that the close script first checks if there are any
+          # remaining untested cases. Only when the untested count is 0
+          # then the TestRail run is closed.
+          post-steps:
+            - run:
+                name: Close TestRail Run
+                when: always
+                command: node ./bin/testrail-close-run.js
+
+  # only tests some of the specs
+  # finds all case IDs in the spec files first
+  # before opening a TestRail run
+  test-some-specs:
+    jobs:
+      - cypress/run:
+          name: Test some specs
+          # instead of building the application
+          # or in addition to it, start a new TestRail run
+          build: |
+            runId=$(node ./bin/testrail-start-run.js \
+              --spec "cypress/integration/spec-a.js"
+              "Testing on Circle workflow ${CIRCLE_WORKFLOW_ID}" \
+              "Cypress tests on CircleCI ${CIRCLE_BUILD_URL}")
+            echo "TestRail run id ${runId}"
+            echo ${runId} > runId.txt
+            echo "Saved file runId.txt"
+            cat runId.txt
+          record: true
+          group: CircleCI Some Specs
           # Try to close the TestRail run using job's post-steps
           # https://circleci.com/docs/2.0/configuration-reference/
           # Note that the close script first checks if there are any
