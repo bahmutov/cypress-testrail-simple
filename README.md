@@ -61,6 +61,16 @@ You can redirect the run ID into a file
 npx testrail-start-run > runId.txt
 ```
 
+#### Arguments
+
+- `--name` optional name for the test run, alias `-n`
+- `--description` optional description for the test run, alias `-d`
+
+```
+npx testrail-start-run --name "test run" --description "test run description"
+# prints the run id
+```
+
 ### testrail-close-run
 
 To close an open test run, pass the run ID as an argument or in the file `./runId.txt`
