@@ -12,6 +12,8 @@ jobs:
       TESTRAIL_PASSWORD: ${{secrets.TESTRAIL_PASSWORD}}
       # the project ID is not that secret
       TESTRAIL_PROJECTID: 1
+      # for debugging the scripts in this package
+      DEBUG: cypress-testrail-simple
 
     steps:
       - name: Checkout 🛎
@@ -55,7 +57,6 @@ jobs:
         env:
           TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.runId }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          # DEBUG: cypress-testrail-simple
 
       - name: Close TestRail Run 🏁
         # always close the test run, even if the previous steps have failed
