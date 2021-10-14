@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/bahmutov/cypress-testrail-simple#readme",
   "devDependencies": {
-    "cypress": "8.5.0",
+    "cypress": "8.6.0",
     "semantic-release": "^18.0.0"
   },
   "dependencies": {
