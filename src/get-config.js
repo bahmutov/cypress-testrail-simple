@@ -14,18 +14,17 @@ function hasConfig(env = process.env) {
 
 function getTestRailConfig(env = process.env) {
   const debug = require('debug')('cypress-testrail-simple')
-  const got = require('got')
 
-  if (!process.env.TESTRAIL_HOST) {
+  if (!env.TESTRAIL_HOST) {
     throw new Error('TESTRAIL_HOST is required')
   }
-  if (!process.env.TESTRAIL_USERNAME) {
+  if (!env.TESTRAIL_USERNAME) {
     throw new Error('TESTRAIL_USERNAME is required')
   }
-  if (!process.env.TESTRAIL_PASSWORD) {
+  if (!env.TESTRAIL_PASSWORD) {
     throw new Error('TESTRAIL_PASSWORD is required. Could be an API key.')
   }
-  if (!process.env.TESTRAIL_PROJECTID) {
+  if (!env.TESTRAIL_PROJECTID) {
     throw new Error('TESTRAIL_PROJECTID is required.')
   }
 

@@ -1,7 +1,6 @@
 // @ts-check
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
-const fs = require('fs')
 const {
   hasConfig,
   getTestRailConfig,
@@ -33,7 +32,7 @@ async function sendTestResults(testRailInfo, runId, testResults) {
   debug('TestRail response: %o', json)
 }
 
-function registerPlugin(on, config) {
+function registerPlugin(on) {
   if (!hasConfig(process.env)) {
     debug('cypress-testrail-simple env variables are not set')
     return
