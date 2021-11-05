@@ -8,16 +8,19 @@ const got = require('got')
 const globby = require('globby')
 const { getTestRailConfig, getAuthorization } = require('../src/get-config')
 const { findCases } = require('../src/find-cases')
+const { getTestSuite } = require('../src/testrail-api')
 
 const args = arg(
   {
     '--spec': String,
     '--name': String,
     '--description': String,
+		'--suite': String,
     // aliases
     '-s': '--spec',
     '-n': '--name',
     '-d': '--description',
+		'-st': '--suite'
   },
   { permissive: true },
 )
@@ -58,6 +61,12 @@ function startRun({ testRailInfo, name, description, caseIds }) {
     json.case_ids = caseIds
   }
   debug('add run params %o', json)
+
+	const suiteId = args['--suite'] || testRailInfo.suiteId
+	if (suiteId) {
+		json.suite_id = +suiteId
+		getTestSuite(suiteId, testRailInfo)
+	}
 
   // @ts-ignore
   return got(addRunUrl, {
