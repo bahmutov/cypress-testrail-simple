@@ -21,7 +21,7 @@ Add the plugin to your Cypress plugin file
 // cypress/plugins/index.js
 module.exports = (on, config) => {
   // https://github.com/bahmutov/cypress-testrail-simple
-  require('cypress-testrail-simple/src/plugin')(on, config)
+  require('cypress-testrail-simple/src/plugin')(on)
 }
 ```
 
@@ -37,6 +37,15 @@ TESTRAIL_USERNAME=
 TESTRAIL_PASSWORD=
 ; Note: the project ID is not very sensitive value
 TESTRAIL_PROJECTID=
+```
+
+If these variables are present, we assume the user wants to use the plugin. You can disable the plugin by passing an argument
+
+```js
+module.exports = (on, config) => {
+  // skip loading the plugin
+  require('cypress-testrail-simple/src/plugin')(on, true)
+}
 ```
 
 ## Bin commands

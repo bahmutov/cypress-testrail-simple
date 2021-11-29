@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 // @ts-check
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
@@ -32,7 +34,26 @@ async function sendTestResults(testRailInfo, runId, testResults) {
   debug('TestRail response: %o', json)
 }
 
-function registerPlugin(on) {
+/**
+ * Registers the cypress-testrail-simple plugin.
+ * @example
+ *  module.exports = (on, config) => {
+ *   require('cypress-testrail-simple/src/plugin')(on)
+ *  }
+ * @example
+ *  Skip the plugin
+ *  module.exports = (on, config) => {
+ *   require('cypress-testrail-simple/src/plugin')(on, true)
+ *  }
+ * @param {Cypress.PluginEvents} on Event registration function from Cypress
+ * @param {Boolean} skipPlugin If true, skips loading the plugin. Defaults to false
+ */
+function registerPlugin(on, skipPlugin = false) {
+  if (skipPlugin === true) {
+    debug('the user explicitly disabled the plugin')
+    return
+  }
+
   if (!hasConfig(process.env)) {
     debug('cypress-testrail-simple env variables are not set')
     return
