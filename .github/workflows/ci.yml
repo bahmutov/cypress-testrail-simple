@@ -45,6 +45,8 @@ jobs:
           echo "TestRail run id ${runId}"
           # save the run ID as the output from this step
           echo "::set-output name=runId::${runId}"
+        env:
+          DEBUG: cypress-testrail-simple
 
       - name: Cypress tests 🧪
         uses: cypress-io/github-action@v2
