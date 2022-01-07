@@ -62,9 +62,15 @@ async function startRun({ testRailInfo, name, description, caseIds }) {
   }
   debug('add run params %o', json)
 
-  const suiteId = args['--suite'] || testRailInfo.suiteId
+  let suiteId = args['--suite'] || testRailInfo.suiteId
   if (suiteId) {
+    // let the user pass the suite ID like the TestRail shows it "S..."
+    // or just the number
+    if (suiteId.startsWith('S')) {
+      suiteId = suiteId.substring(1)
+    }
     json.suite_id = Number(suiteId)
+    // simply print all test cases
     await getTestSuite(suiteId, testRailInfo)
   }
 
