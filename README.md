@@ -113,6 +113,7 @@ During `cypress run` the plugin can send test results for each test case found i
 ## Examples
 
 - [bahmutov/test-rail-example](https://github.com/bahmutov/test-rail-example)
+- [bahmutov/test-rail-suite-example](https://github.com/bahmutov/test-rail-suite-example)
 
 ## Debugging
 
