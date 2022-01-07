@@ -13,7 +13,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "format": "prettier --write '{cypress,src,bin}/**/*.js'"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,7 @@
   "homepage": "https://github.com/bahmutov/cypress-testrail-simple#readme",
   "devDependencies": {
     "cypress": "9.2.0",
+    "prettier": "^2.5.1",
     "semantic-release": "^18.0.0"
   },
   "dependencies": {

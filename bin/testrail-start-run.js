@@ -15,12 +15,12 @@ const args = arg(
     '--spec': String,
     '--name': String,
     '--description': String,
-		'--suite': String,
+    '--suite': String,
     // aliases
     '-s': '--spec',
     '-n': '--name',
     '-d': '--description',
-		'-st': '--suite'
+    '-st': '--suite',
   },
   { permissive: true },
 )
@@ -38,7 +38,7 @@ function findSpecs(pattern) {
   })
 }
 
-function startRun({ testRailInfo, name, description, caseIds }) {
+async function startRun({ testRailInfo, name, description, caseIds }) {
   // only output the run ID to the STDOUT, everything else is logged to the STDERR
   console.error(
     'creating new TestRail run for project %s',
@@ -62,11 +62,11 @@ function startRun({ testRailInfo, name, description, caseIds }) {
   }
   debug('add run params %o', json)
 
-	const suiteId = args['--suite'] || testRailInfo.suiteId
-	if (suiteId) {
-		json.suite_id = +suiteId
-		getTestSuite(suiteId, testRailInfo)
-	}
+  const suiteId = args['--suite'] || testRailInfo.suiteId
+  if (suiteId) {
+    json.suite_id = Number(suiteId)
+    await getTestSuite(suiteId, testRailInfo)
+  }
 
   // @ts-ignore
   return got(addRunUrl, {

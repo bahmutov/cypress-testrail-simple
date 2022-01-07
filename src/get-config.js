@@ -33,7 +33,7 @@ function getTestRailConfig(env = process.env) {
     username: process.env.TESTRAIL_USERNAME,
     password: process.env.TESTRAIL_PASSWORD,
     projectId: process.env.TESTRAIL_PROJECTID,
-    suiteId: process.env.TESTRAIL_SUITEID
+    suiteId: process.env.TESTRAIL_SUITEID,
   }
   debug('test rail info without the password')
   debug('%o', { ...testRailInfo, password: '***' })

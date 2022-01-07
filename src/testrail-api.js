@@ -63,8 +63,7 @@ async function getTestSuite(suiteId, testRailInfo) {
       'Content-Type': 'application/json',
       authorization,
     },
-  })
-  .json()
+  }).json()
 
   debug('get test suite %d response', suiteId)
   debug(json)
