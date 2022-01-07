@@ -43,5 +43,16 @@
     "debug": "^4.3.2",
     "globby": "^11",
     "got": "^11.8.2"
+  },
+  "release": {
+    "branches": [
+      {
+        "name": "main"
+      },
+      {
+        "name": "suite-support",
+        "prerelease": true
+      }
+    ]
   }
 }
