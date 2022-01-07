@@ -8,16 +8,19 @@ const got = require('got')
 const globby = require('globby')
 const { getTestRailConfig, getAuthorization } = require('../src/get-config')
 const { findCases } = require('../src/find-cases')
+const { getTestSuite } = require('../src/testrail-api')
 
 const args = arg(
   {
     '--spec': String,
     '--name': String,
     '--description': String,
+    '--suite': String,
     // aliases
     '-s': '--spec',
     '-n': '--name',
     '-d': '--description',
+    '-st': '--suite',
   },
   { permissive: true },
 )
@@ -35,7 +38,7 @@ function findSpecs(pattern) {
   })
 }
 
-function startRun({ testRailInfo, name, description, caseIds }) {
+async function startRun({ testRailInfo, name, description, caseIds }) {
   // only output the run ID to the STDOUT, everything else is logged to the STDERR
   console.error(
     'creating new TestRail run for project %s',
@@ -58,6 +61,18 @@ function startRun({ testRailInfo, name, description, caseIds }) {
     json.case_ids = caseIds
   }
   debug('add run params %o', json)
+
+  let suiteId = args['--suite'] || testRailInfo.suiteId
+  if (suiteId) {
+    // let the user pass the suite ID like the TestRail shows it "S..."
+    // or just the number
+    if (suiteId.startsWith('S')) {
+      suiteId = suiteId.substring(1)
+    }
+    json.suite_id = Number(suiteId)
+    // simply print all test cases
+    await getTestSuite(suiteId, testRailInfo)
+  }
 
   // @ts-ignore
   return got(addRunUrl, {
