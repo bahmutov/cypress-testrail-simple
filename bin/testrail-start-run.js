@@ -70,6 +70,7 @@ async function startRun({ testRailInfo, name, description, caseIds }) {
       suiteId = suiteId.substring(1)
     }
     json.suite_id = Number(suiteId)
+    debug('suite id %d', json.suite_id)
     // simply print all test cases
     await getTestSuite(suiteId, testRailInfo)
   }
