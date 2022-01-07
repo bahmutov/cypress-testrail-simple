@@ -39,8 +39,8 @@ TESTRAIL_USERNAME=
 TESTRAIL_PASSWORD=
 ; Note: the project ID is not very sensitive value
 TESTRAIL_PROJECTID=
-; if you use suites, add a suite ID
-TESTRAIL_SUITEID=S...
+; if you use suites, add a suite ID (with S or without)
+TESTRAIL_SUITEID=...
 ```
 
 If these variables are present, we assume the user wants to use the plugin. You can disable the plugin by passing an argument
@@ -78,6 +78,7 @@ npx testrail-start-run > runId.txt
 
 - `--name` optional name for the test run, alias `-n`
 - `--description` optional description for the test run, alias `-d`
+- `--suite` optional suite ID, alias `-s`
 - `--spec` optional [globby](https://github.com/sindresorhus/globby#readme) pattern for finding specs, extracting case IDs (using the `C\d+` regular expression), and starting a new TestRail run with those case IDs only. Alias `-s`. This option is very useful if only some test cases are automated using Cypress. See the workflow examples in [.github/workflows/cases.yml](./.github/workflows/cases.yml) and [.circleci/config.yml](./.circleci/config.yml).
 
 ```
