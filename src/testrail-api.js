@@ -51,4 +51,24 @@ async function closeTestRun(runId, testRailInfo) {
   return json
 }
 
-module.exports = { getTestRun, closeTestRun }
+async function getTestSuite(suiteId, testRailInfo) {
+  const getSuiteUrl = `${testRailInfo.host}/index.php?/api/v2/get_cases/${testRailInfo.projectId}&suite_id=${suiteId}`
+  debug('get suite url: %s', getSuiteUrl)
+  const authorization = getAuthorization(testRailInfo)
+
+  // @ts-ignore
+  const json = await got(getSuiteUrl, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization,
+    },
+  })
+  .json()
+
+  debug('get test suite %d response', suiteId)
+  debug(json)
+  return json
+}
+
+module.exports = { getTestRun, closeTestRun, getTestSuite }
