@@ -22,8 +22,8 @@ if (!runId) {
 }
 
 const testRailInfo = getTestRailConfig()
-debug('test rail info without the password')
-debug('%o', { ...testRailInfo, password: '***' })
+debug('test rail info without the password masked')
+debug('%o', { ...testRailInfo, password: '<masked>' })
 
 getTestRun(runId, testRailInfo).then((runInfo) => {
   if (runInfo.is_completed) {
