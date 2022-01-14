@@ -1,18 +1,26 @@
 const fs = require('fs')
 
-function findCasesInSpec(spec) {
-  const source = fs.readFileSync(spec, 'utf8')
-  const matches = source.match(/C\d+/g)
+/**
+ * Finds the test case IDs in the test titles.
+ * @example "C101: Test case title" => "101"
+ */
+function findCasesInSpec(spec, readSpec = fs.readFileSync) {
+  const source = readSpec(spec, 'utf8')
+  // the test case ID has to be by itself or next to a quote
+  const matches = source.match(/['" ]C\d+['" ]/g)
   if (!matches) {
     // no case Ids found
     return []
   }
-  return matches.map((m) => m.slice(1)).map(Number)
+  const cleaned = matches.map((m) => m.replace(/['\'"C']/g, ''))
+  return cleaned.map(Number)
 }
 
-function findCases(specs) {
+function findCases(specs, readSpec = fs.readFileSync) {
   // find case Ids in each spec and flatten into a single array
-  return specs.map(findCasesInSpec).reduce((a, b) => a.concat(b), [])
+  return specs
+    .map((spec) => findCasesInSpec(spec, readSpec))
+    .reduce((a, b) => a.concat(b), [])
 }
 
-module.exports = { findCases }
+module.exports = { findCases, findCasesInSpec }
