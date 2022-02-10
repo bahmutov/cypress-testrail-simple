@@ -13,17 +13,19 @@ const {
   getTestRunId,
 } = require('../src/get-config')
 
-async function sendTestResults(testRailInfo, runId, testResults) {
+const testRailInfo = getTestRailConfig()
+const runId = getTestRunId()
+const addResultsUrl = `${testRailInfo.host}/index.php?/api/v2/add_results_for_cases/${runId}`
+const getResultsForCaseUrl = (case_id) => `${testRailInfo.host}/index.php?/api/v2/get_results_for_case/${runId}/${case_id}&limit=1`
+const addAttachToResultUrl = (result_id) => `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${result_id}`
+const authorization = getAuthorization(testRailInfo)
+
+async function sendTestResults( testResults) {
   debug(
       'sending %d test results to TestRail for run %d',
       testResults.length,
       runId,
   )
-
-  const addResultsUrl = `${testRailInfo.host}/index.php?/api/v2/add_results_for_cases/${runId}`
-  const getResultsForCaseUrl = (case_id) => `${testRailInfo.host}/index.php?/api/v2/get_results_for_case/${runId}/${case_id}`
-  const addAttachToResultUrl = (result_id) => `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${result_id}`
-  const authorization = getAuthorization(testRailInfo)
 
   // @ts-ignore
   const json = await got(addResultsUrl, {
@@ -36,6 +38,12 @@ async function sendTestResults(testRailInfo, runId, testResults) {
       results: testResults,
     },
   }).json()
+
+  const result = await attachScreenshots(testResults)
+  debug('TestRail response: %o', json)
+}
+
+async function attachScreenshots(testResults){
   const  failedTestsResults = testResults.filter(result => result.status_id === 5 )
   for (const testResult of failedTestsResults){
     const caseId = testResult.case_id
@@ -56,22 +64,20 @@ async function sendTestResults(testRailInfo, runId, testResults) {
           let form = new FormData()
           form.append('attachment', fs.createReadStream(`./${screenshot}`));
 
-          const a =  await got(addAttachToResultUrl(resultId), {
+          const attachResponse =  await got(addAttachToResultUrl(resultId), {
             method: 'POST',
             headers: {
               authorization
             },
             body: form
           }).json()
-          console.log(a)
+          console.log(attachResponse)
         }
       } catch (err) {
         console.log('Error on adding screenshots', err)
       }
     }
   }
-
-  debug('TestRail response: %o', json)
 }
 
 /**
@@ -99,8 +105,6 @@ function registerPlugin(on, skipPlugin = false) {
     return
   }
 
-  const testRailInfo = getTestRailConfig()
-  const runId = getTestRunId()
   if (!runId) {
     throw new Error('Missing test rail run ID')
   }
@@ -139,7 +143,7 @@ function registerPlugin(on, skipPlugin = false) {
     if (testRailResults.length) {
       console.log('TestRail results in %s', spec.relative)
       console.table(testRailResults)
-      return sendTestResults(testRailInfo, runId, testRailResults)
+      return sendTestResults(testRailResults)
     }
   })
 }
