@@ -3,6 +3,9 @@
 // @ts-check
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
+const fs = require('fs')
+const find = require('find')
+const FormData = require('form-data')
 const {
   hasConfig,
   getTestRailConfig,
@@ -12,11 +15,14 @@ const {
 
 async function sendTestResults(testRailInfo, runId, testResults) {
   debug(
-    'sending %d test results to TestRail for run %d',
-    testResults.length,
-    runId,
+      'sending %d test results to TestRail for run %d',
+      testResults.length,
+      runId,
   )
+
   const addResultsUrl = `${testRailInfo.host}/index.php?/api/v2/add_results_for_cases/${runId}`
+  const getResultsForCaseUrl = (case_id) => `${testRailInfo.host}/index.php?/api/v2/get_results_for_case/${runId}/${case_id}`
+  const addAttachToResultUrl = (result_id) => `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${result_id}`
   const authorization = getAuthorization(testRailInfo)
 
   // @ts-ignore
@@ -30,6 +36,40 @@ async function sendTestResults(testRailInfo, runId, testResults) {
       results: testResults,
     },
   }).json()
+  const  failedTestsResults = testResults.filter(result => result.status_id === 5 )
+  for (const testResult of failedTestsResults){
+    const caseId = testResult.case_id
+    const caseResults = await got(getResultsForCaseUrl(caseId), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization,
+      }
+    }).json()
+
+    for(const result of caseResults.results){
+      const resultId = result.id
+      try {
+        const files =  find.fileSync('./cypress/screenshots/')
+        const  screenshots = files.filter(file => file.includes(`${caseId}`))
+        for (const screenshot of screenshots){
+          let form = new FormData()
+          form.append('attachment', fs.createReadStream(`./${screenshot}`));
+
+          const a =  await got(addAttachToResultUrl(resultId), {
+            method: 'POST',
+            headers: {
+              authorization
+            },
+            body: form
+          }).json()
+          console.log(a)
+        }
+      } catch (err) {
+        console.log('Error on adding screenshots', err)
+      }
+    }
+  }
 
   debug('TestRail response: %o', json)
 }
