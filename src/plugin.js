@@ -46,6 +46,7 @@ async function sendTestResults(testResults) {
 async function attachScreenshots(testResults){
   const failedTestsResults = testResults.filter(result => result.status_id === 5)
 
+  console.log(failedTestsResults)
   for (const testResult of failedTestsResults){
     const caseId = testResult.case_id
     const caseResults = await got(getResultsForCaseUrl(caseId), {
@@ -64,6 +65,7 @@ async function attachScreenshots(testResults){
         const screenshots = files.filter(file => file.includes(`${caseId}`))
 
         for (const screenshot of screenshots){
+          console.log(screenshot)
           let form = new FormData()
 
           form.append("attachment", fs.createReadStream(`./${screenshot}`))
