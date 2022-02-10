@@ -1,37 +1,37 @@
-/// <reference types="cypress" />
+// / <reference types="cypress" />
 
 // @ts-check
-const debug = require('debug')('cypress-testrail-simple')
-const got = require('got')
-const fs = require('fs')
-const find = require('find')
-const FormData = require('form-data')
+const debug = require("debug")("cypress-testrail-simple")
+const got = require("got")
+const fs = require("fs")
+const find = require("find")
+const FormData = require("form-data")
 const {
   hasConfig,
   getTestRailConfig,
   getAuthorization,
   getTestRunId,
-} = require('../src/get-config')
+} = require("../src/get-config")
 
 const testRailInfo = getTestRailConfig()
 const runId = getTestRunId()
 const addResultsUrl = `${testRailInfo.host}/index.php?/api/v2/add_results_for_cases/${runId}`
-const getResultsForCaseUrl = (case_id) => `${testRailInfo.host}/index.php?/api/v2/get_results_for_case/${runId}/${case_id}&limit=1`
-const addAttachToResultUrl = (result_id) => `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${result_id}`
+const getResultsForCaseUrl = case_id => `${testRailInfo.host}/index.php?/api/v2/get_results_for_case/${runId}/${case_id}&limit=1`
+const addAttachToResultUrl = result_id => `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${result_id}`
 const authorization = getAuthorization(testRailInfo)
 
-async function sendTestResults( testResults) {
+async function sendTestResults(testResults) {
   debug(
-      'sending %d test results to TestRail for run %d',
+      "sending %d test results to TestRail for run %d",
       testResults.length,
       runId,
   )
 
   // @ts-ignore
   const json = await got(addResultsUrl, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       authorization,
     },
     json: {
@@ -40,46 +40,50 @@ async function sendTestResults( testResults) {
   }).json()
 
   const result = await attachScreenshots(testResults)
-  debug('TestRail response: %o', json)
-}
 
+  debug("TestRail response: %o", json)
+}
 async function attachScreenshots(testResults){
-  const  failedTestsResults = testResults.filter(result => result.status_id === 5 )
+  const failedTestsResults = testResults.filter(result => result.status_id === 5)
+
   for (const testResult of failedTestsResults){
     const caseId = testResult.case_id
     const caseResults = await got(getResultsForCaseUrl(caseId), {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         authorization,
       }
     }).json()
 
-    for(const result of caseResults.results){
+    for (const result of caseResults.results){
       const resultId = result.id
+
       try {
-        const files =  find.fileSync('./cypress/screenshots/')
-        const  screenshots = files.filter(file => file.includes(`${caseId}`))
+        const files = find.fileSync("./cypress/screenshots/")
+        const screenshots = files.filter(file => file.includes(`${caseId}`))
+
         for (const screenshot of screenshots){
           let form = new FormData()
-          form.append('attachment', fs.createReadStream(`./${screenshot}`));
 
-          const attachResponse =  await got(addAttachToResultUrl(resultId), {
-            method: 'POST',
+          form.append("attachment", fs.createReadStream(`./${screenshot}`))
+
+          const attachResponse = await got(addAttachToResultUrl(resultId), {
+            method: "POST",
             headers: {
               authorization
             },
             body: form
           }).json()
+
           console.log(attachResponse)
         }
       } catch (err) {
-        console.log('Error on adding screenshots', err)
+        console.log("Error on adding screenshots", err)
       }
     }
   }
 }
-
 /**
  * Registers the cypress-testrail-simple plugin.
  * @example
@@ -96,34 +100,36 @@ async function attachScreenshots(testResults){
  */
 function registerPlugin(on, skipPlugin = false) {
   if (skipPlugin === true) {
-    debug('the user explicitly disabled the plugin')
+    debug("the user explicitly disabled the plugin")
+
     return
   }
-
   if (!hasConfig(process.env)) {
-    debug('cypress-testrail-simple env variables are not set')
+    debug("cypress-testrail-simple env variables are not set")
+
     return
   }
-
   if (!runId) {
-    throw new Error('Missing test rail run ID')
+    throw new Error("Missing test rail run ID")
   }
 
   // should we ignore test results if running in the interactive mode?
   // right now these callbacks only happen in the non-interactive mode
 
   // https://on.cypress.io/after-spec-api
-  on('after:spec', (spec, results) => {
-    debug('after:spec')
+  on("after:spec", (spec, results) => {
+    debug("after:spec")
     debug(spec)
     debug(results)
 
     // find only the tests with TestRail case id in the test name
     const testRailResults = []
-    results.tests.forEach((result) => {
+
+    results.tests.forEach(result => {
       const testRailCaseReg = /C(\d+)\s/
       // only look at the test name, not at the suite titles
       const testName = result.title[result.title.length - 1]
+
       if (testRailCaseReg.test(testName)) {
         const testRailResult = {
           case_id: parseInt(testRailCaseReg.exec(testName)[1]),
@@ -135,17 +141,18 @@ function registerPlugin(on, skipPlugin = false) {
           // Failed = 5,
           // TODO: map all Cypress test states into TestRail status
           // https://glebbahmutov.com/blog/cypress-test-statuses/
-          status_id: result.state === 'passed' ? 1 : 5,
+          status_id: result.state === "passed" ? 1 : 5,
         }
+
         testRailResults.push(testRailResult)
       }
     })
     if (testRailResults.length) {
-      console.log('TestRail results in %s', spec.relative)
+      console.log("TestRail results in %s", spec.relative)
       console.table(testRailResults)
+
       return sendTestResults(testRailResults)
     }
   })
 }
-
 module.exports = registerPlugin
