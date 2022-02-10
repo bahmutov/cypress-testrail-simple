@@ -38,7 +38,7 @@ async function sendTestResults(testResults) {
       results: testResults,
     },
   }).json()
-
+  console.log("Test1")
   const result = await attachScreenshots(testResults)
 
   debug("TestRail response: %o", json)
@@ -46,6 +46,7 @@ async function sendTestResults(testResults) {
 async function attachScreenshots(testResults){
   const failedTestsResults = testResults.filter(result => result.status_id === 5)
 
+  console.log("Test2")
   console.log(failedTestsResults)
   for (const testResult of failedTestsResults){
     const caseId = testResult.case_id
