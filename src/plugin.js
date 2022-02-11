@@ -26,7 +26,7 @@ const authorization = getAuthorization(testRailInfo)
 const statuses = {
   "passed": testRailStatuses.PASSED,
   "failed": testRailStatuses.FAILED,
-  "skipped": testRailStatuses.UNTESTED
+  "pending": testRailStatuses.UNTESTED
 }
 
 async function sendTestResults(testResults) {
@@ -137,31 +137,21 @@ function registerPlugin(on, skipPlugin = false) {
       // only look at the test name, not at the suite titles
       const testName = result.title[result.title.length - 1]
 
-      if (testRailCaseReg.test(testName)) {
+      // TestRail doesn't accept result = Untested
+      if (testRailCaseReg.test(testName) && result.state !== "pending") {
         const testRailResult = {
           case_id: parseInt(testRailCaseReg.exec(testName)[1]),
-          // TestRail status
-          // Passed = 1,
-          // Blocked = 2,
-          // Untested = 3,
-          // Retest = 4,
-          // Failed = 5,
-          // TODO: map all Cypress test states into TestRail status
-          // https://glebbahmutov.com/blog/cypress-test-statuses/
-         // status_id: result.state === "passed" ? testRailStatuses.PASSED : testRailStatuses.FAILED,
           status_id: statuses[result.state]
         }
-
         if(testRailResult.status_id === testRailStatuses.FAILED){
           testRailResult.comment = getTestComments(result.displayError, result.body)
         }
-
         testRailResults.push(testRailResult)
       }
     })
     if (testRailResults.length) {
       console.log("TestRail results in %s", spec.relative)
-      console.table(testRailResults)
+      console.table(testRailResults, ["case_id", "status_id"])
 
       return sendTestResults(testRailResults)
     }
