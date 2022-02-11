@@ -26,7 +26,8 @@ const authorization = getAuthorization(testRailInfo)
 const statuses = {
   "passed": testRailStatuses.PASSED,
   "failed": testRailStatuses.FAILED,
-  "pending": testRailStatuses.UNTESTED
+  "pending": testRailStatuses.UNTESTED,
+  "skipped": testRailStatuses.FAILED
 }
 
 async function sendTestResults(testResults) {
