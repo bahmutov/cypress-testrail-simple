@@ -142,7 +142,7 @@ function registerPlugin(on, skipPlugin = false) {
       if (testRailCaseReg.test(testName) && result.state !== "pending") {
         const testRailResult = {
           case_id: parseInt(testRailCaseReg.exec(testName)[1]),
-          status_id: statuses[result.state]
+          status_id: statuses[result.state] || testRailStatuses.FAILED
         }
         if(testRailResult.status_id === testRailStatuses.FAILED){
           testRailResult.comment = getTestComments(result.displayError, result.body)
@@ -160,9 +160,11 @@ function registerPlugin(on, skipPlugin = false) {
 }
 
 function getTestComments (displayError, testBody){
+  const logs = testBody.split("\n").filter(log =>  log.includes("cy.log")).map(log=> `${log}\n`)
   return `Error:
   ${displayError}
   Test body:
-  ${testBody}`
+  ${logs}`
 }
+
 module.exports = registerPlugin
