@@ -160,7 +160,7 @@ function registerPlugin(on, skipPlugin = false) {
 }
 
 function getTestComments (displayError, testBody){
-  const logs = testBody.split("\n").filter(log =>  log.includes("cy.log")).map(log=> `${log}\n`)
+  const logs = testBody.split("\n").filter(log =>  log.includes("cy.log")).map(log => log.trim()).join("\n")
   return `Error:
   ${displayError}
   Test body:
