@@ -12,6 +12,10 @@ const {
   getAuthorization,
   getTestRunId,
 } = require("../src/get-config")
+const {
+  testRailStatuses
+} = require("../src/testRailStatuses")
+
 
 const testRailInfo = getTestRailConfig()
 const runId = getTestRunId()
@@ -19,6 +23,11 @@ const addResultsUrl = `${testRailInfo.host}/index.php?/api/v2/add_results_for_ca
 const getResultsForCaseUrl = case_id => `${testRailInfo.host}/index.php?/api/v2/get_results_for_case/${runId}/${case_id}&limit=1`
 const addAttachToResultUrl = result_id => `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${result_id}`
 const authorization = getAuthorization(testRailInfo)
+const statuses = {
+  "passed": testRailStatuses.PASSED,
+  "failed": testRailStatuses.FAILED,
+  "skipped": testRailStatuses.UNTESTED
+}
 
 async function sendTestResults(testResults) {
   debug(
@@ -43,7 +52,7 @@ async function sendTestResults(testResults) {
   debug("TestRail response: %o", json)
 }
 async function attachScreenshots(testResults){
-  const failedTestsResults = testResults.filter(result => result.status_id === 5)
+  const failedTestsResults = testResults.filter(result => result.status_id === testRailStatuses.FAILED)
 
   for (const testResult of failedTestsResults){
     const caseId = testResult.case_id
@@ -139,7 +148,12 @@ function registerPlugin(on, skipPlugin = false) {
           // Failed = 5,
           // TODO: map all Cypress test states into TestRail status
           // https://glebbahmutov.com/blog/cypress-test-statuses/
-          status_id: result.state === "passed" ? 1 : 5,
+         // status_id: result.state === "passed" ? testRailStatuses.PASSED : testRailStatuses.FAILED,
+          status_id: statuses[result.state]
+        }
+
+        if(testRailResult.status_id === testRailStatuses.FAILED){
+          testRailResult.comment = getTestComments(result.displayError, result.body)
         }
 
         testRailResults.push(testRailResult)
@@ -152,5 +166,12 @@ function registerPlugin(on, skipPlugin = false) {
       return sendTestResults(testRailResults)
     }
   })
+}
+
+function getTestComments (displayError, testBody){
+  return `Error:
+  ${displayError}
+  Test body:
+  ${testBody}`
 }
 module.exports = registerPlugin
