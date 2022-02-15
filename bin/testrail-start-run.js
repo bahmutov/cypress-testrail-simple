@@ -57,8 +57,13 @@ async function startRun({ testRailInfo, name, description, caseIds }) {
     description,
   }
   if (caseIds && caseIds.length > 0) {
+    const uniqueCaseIds = [...new Set(caseIds)]
+    if (uniqueCaseIds.length !== caseIds.length) {
+      debug('Removed duplicate case IDs')
+      debug('have %d case IDs', uniqueCaseIds.length)
+    }
     json.include_all = false
-    json.case_ids = caseIds
+    json.case_ids = uniqueCaseIds
   }
   debug('add run params %o', json)
 

@@ -119,6 +119,12 @@ During `cypress run` the plugin can send test results for each test case found i
 
 This tool uses [debug](https://github.com/visionmedia/debug#readme) to output verbose logs. To see the logs, run it with environment variable `DEBUG=cypress-testrail-simple`.
 
+To start a new test rail run locally and see how the new run is created
+
+```
+$ as-a . node ./bin/testrail-start-run.js --spec 'cypress/integration/*.js'
+```
+
 ## Why?
 
 Because [cypress-testrail-reporter](https://github.com/Vivify-Ideas/cypress-testrail-reporter) is broken in a variety of ways and does not let me open issues to report the problems.
