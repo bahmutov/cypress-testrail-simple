@@ -16,13 +16,6 @@ const {
   testRailStatuses
 } = require("../src/testRailStatuses")
 
-
-const testRailInfo = getTestRailConfig()
-const runId = getTestRunId()
-const addResultsUrl = `${testRailInfo.host}/index.php?/api/v2/add_results_for_cases/${runId}`
-const getResultsForCaseUrl = case_id => `${testRailInfo.host}/index.php?/api/v2/get_results_for_case/${runId}/${case_id}&limit=1`
-const addAttachToResultUrl = result_id => `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${result_id}`
-const authorization = getAuthorization(testRailInfo)
 const statuses = {
   "passed": testRailStatuses.PASSED,
   "failed": testRailStatuses.FAILED,
@@ -30,10 +23,12 @@ const statuses = {
   "skipped": testRailStatuses.FAILED
 }
 
-async function sendTestResults(testResults) {
+async function sendTestResults(testRailInfo, runId, testRailResults) {
+  const authorization = getAuthorization(testRailInfo)
+  const addResultsUrl = `${testRailInfo.host}/index.php?/api/v2/add_results_for_cases/${runId}`
   debug(
       "sending %d test results to TestRail for run %d",
-      testResults.length,
+      testRailResults.length,
       runId,
   )
 
@@ -45,15 +40,18 @@ async function sendTestResults(testResults) {
       authorization,
     },
     json: {
-      results: testResults,
+      results: testRailResults,
     },
   }).json()
-  const result = await attachScreenshots(testResults)
+  const result = await attachScreenshots(testRailInfo, runId, testRailResults)
 
   debug("TestRail response: %o", json)
 }
-async function attachScreenshots(testResults){
-  const failedTestsResults = testResults.filter(result => result.status_id === testRailStatuses.FAILED)
+async function attachScreenshots(testRailInfo, runId, testRailResults){
+  const getResultsForCaseUrl = case_id => `${testRailInfo.host}/index.php?/api/v2/get_results_for_case/${runId}/${case_id}&limit=1`
+  const addAttachToResultUrl = result_id => `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${result_id}`
+  const authorization = getAuthorization(testRailInfo)
+  const failedTestsResults = testRailResults.filter(result => result.status_id === testRailStatuses.FAILED)
 
   for (const testResult of failedTestsResults){
     const caseId = testResult.case_id
@@ -117,6 +115,10 @@ function registerPlugin(on, skipPlugin = false) {
 
     return
   }
+
+  const testRailInfo = getTestRailConfig()
+  const runId = getTestRunId()
+
   if (!runId) {
     throw new Error("Missing test rail run ID")
   }
@@ -154,7 +156,7 @@ function registerPlugin(on, skipPlugin = false) {
       console.log("TestRail results in %s", spec.relative)
       console.table(testRailResults, ["case_id", "status_id"])
 
-      return sendTestResults(testRailResults)
+      return sendTestResults(testRailInfo, runId, testRailResults)
     }
   })
 }
