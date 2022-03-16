@@ -99,7 +99,12 @@ function registerPlugin(on, skipPlugin = false) {
     if (testRailResults.length) {
       console.log('TestRail results in %s', spec.relative)
       console.table(testRailResults)
-      return sendTestResults(testRailInfo, runId, testRailResults)
+      return sendTestResults(testRailInfo, runId, testRailResults).catch(
+        (err) => {
+          console.error('Error sending TestRail results')
+          console.error(err)
+        },
+      )
     }
   })
 }
