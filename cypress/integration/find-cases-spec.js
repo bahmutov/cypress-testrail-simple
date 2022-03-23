@@ -15,11 +15,19 @@ describe('Finding test case IDs', () => {
       it('new case C199', () => {
         cy.wait(15000)
       })
+
+      it(\`C123 \${testNameExtension}\`, () => {
+        cy.wait(15000)
+      })
+
+      it(\`awesome C456 \${testNameExtension}\`, () => {
+        cy.wait(15000)
+      })
     `
     const readFile = cy.stub().returns(source)
     const filename = 'test-spec.js'
     const ids = findCasesInSpec(filename, readFile)
-    expect(ids, 'test cases').to.deep.equal([1, 2002, 199])
+    expect(ids, 'test cases').to.deep.equal([1, 2002, 199, 123, 456])
     expect(readFile).to.be.calledOnceWithExactly(filename, 'utf8')
   })
 
@@ -41,12 +49,20 @@ describe('Finding test case IDs', () => {
         cy.wait(15000)
       })
     `
+
+    const source4 = `
+    it(\`C123 \${testNameExtension}\`, () => {
+      cy.wait(15000)
+    })
+    `
+
     const readFile = cy.stub()
     readFile.withArgs('file1.js', 'utf8').returns(source1)
     readFile.withArgs('file2.js', 'utf8').returns(source2)
     readFile.withArgs('file3.js', 'utf8').returns(source3)
-    const ids = findCases(['file1.js', 'file2.js', 'file3.js'], readFile)
-    expect(ids, 'test cases').to.deep.equal([1, 199])
+    readFile.withArgs('file4.js', 'utf8').returns(source4)
+    const ids = findCases(['file1.js', 'file2.js', 'file3.js', 'file4.js'], readFile)
+    expect(ids, 'test cases').to.deep.equal([1, 199, 123])
   })
 
   it('returns an empty list', () => {
@@ -74,10 +90,11 @@ describe('Finding test case IDs', () => {
     const source = `
       "C1"
       'C2'
+      \`C3\`
     `
     const readFile = cy.stub().returns(source)
     const filename = 'test-spec.js'
     const ids = findCasesInSpec(filename, readFile)
-    expect(ids, 'test cases').to.deep.equal([1, 2])
+    expect(ids, 'test cases').to.deep.equal([1, 2, 3])
   })
 })
