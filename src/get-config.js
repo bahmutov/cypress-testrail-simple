@@ -35,7 +35,7 @@ function getTestRailConfig(env = process.env) {
     projectId: process.env.TESTRAIL_PROJECTID,
     suiteId: process.env.TESTRAIL_SUITEID,
   }
-  debug('test rail info without the password masked')
+  debug('test rail info with the password masked')
   debug('%o', { ...testRailInfo, password: '<masked>' })
 
   return testRailInfo

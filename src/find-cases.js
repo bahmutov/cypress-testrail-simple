@@ -7,12 +7,12 @@ const fs = require('fs')
 function findCasesInSpec(spec, readSpec = fs.readFileSync) {
   const source = readSpec(spec, 'utf8')
   // the test case ID has to be by itself or next to a quote
-  const matches = source.match(/['" ]C\d+['" ]/g)
+  const matches = source.match(/['"` ]C\d+['"` ]/g)
   if (!matches) {
     // no case Ids found
     return []
   }
-  const cleaned = matches.map((m) => m.replace(/['\'"C']/g, ''))
+  const cleaned = matches.map((m) => m.replace(/['`\'"C']/g, ''))
   return cleaned.map(Number)
 }
 

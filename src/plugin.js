@@ -3,21 +3,32 @@
 // @ts-check
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
+const fs = require('fs')
+const find = require('find')
+const FormData = require('form-data')
 const {
   hasConfig,
   getTestRailConfig,
   getAuthorization,
   getTestRunId,
 } = require('../src/get-config')
+const { testRailStatuses } = require('../src/testRailStatuses')
 
-async function sendTestResults(testRailInfo, runId, testResults) {
+const statuses = {
+  passed: testRailStatuses.PASSED,
+  failed: testRailStatuses.FAILED,
+  pending: testRailStatuses.UNTESTED,
+  skipped: testRailStatuses.FAILED,
+}
+
+async function sendTestResults(testRailInfo, runId, testRailResults) {
+  const authorization = getAuthorization(testRailInfo)
+  const addResultsUrl = `${testRailInfo.host}/index.php?/api/v2/add_results_for_cases/${runId}`
   debug(
     'sending %d test results to TestRail for run %d',
-    testResults.length,
+    testRailResults.length,
     runId,
   )
-  const addResultsUrl = `${testRailInfo.host}/index.php?/api/v2/add_results_for_cases/${runId}`
-  const authorization = getAuthorization(testRailInfo)
 
   // @ts-ignore
   const json = await got(addResultsUrl, {
@@ -27,13 +38,59 @@ async function sendTestResults(testRailInfo, runId, testResults) {
       authorization,
     },
     json: {
-      results: testResults,
+      results: testRailResults,
     },
   }).json()
+  const result = await attachScreenshots(testRailInfo, runId, testRailResults)
 
   debug('TestRail response: %o', json)
 }
+async function attachScreenshots(testRailInfo, runId, testRailResults) {
+  const getResultsForCaseUrl = (case_id) =>
+    `${testRailInfo.host}/index.php?/api/v2/get_results_for_case/${runId}/${case_id}&limit=1`
+  const addAttachToResultUrl = (result_id) =>
+    `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${result_id}`
+  const authorization = getAuthorization(testRailInfo)
+  const failedTestsResults = testRailResults.filter(
+    (result) => result.status_id === testRailStatuses.FAILED,
+  )
 
+  for (const testResult of failedTestsResults) {
+    const caseId = testResult.case_id
+    const caseResults = await got(getResultsForCaseUrl(caseId), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization,
+      },
+    }).json()
+
+    for (const result of caseResults.results) {
+      const resultId = result.id
+
+      try {
+        const files = find.fileSync('./cypress/screenshots/')
+        const screenshots = files.filter((file) => file.includes(`${caseId}`))
+
+        for (const screenshot of screenshots) {
+          let form = new FormData()
+
+          form.append('attachment', fs.createReadStream(`./${screenshot}`))
+
+          const attachResponse = await got(addAttachToResultUrl(resultId), {
+            method: 'POST',
+            headers: {
+              authorization,
+            },
+            body: form,
+          }).json()
+        }
+      } catch (err) {
+        console.log('Error on adding screenshots', err)
+      }
+    }
+  }
+}
 /**
  * Registers the cypress-testrail-simple plugin.
  * @example
@@ -51,16 +108,18 @@ async function sendTestResults(testRailInfo, runId, testResults) {
 function registerPlugin(on, skipPlugin = false) {
   if (skipPlugin === true) {
     debug('the user explicitly disabled the plugin')
+
     return
   }
-
   if (!hasConfig(process.env)) {
     debug('cypress-testrail-simple env variables are not set')
+
     return
   }
 
   const testRailInfo = getTestRailConfig()
   const runId = getTestRunId()
+
   if (!runId) {
     throw new Error('Missing test rail run ID')
   }
@@ -76,30 +135,31 @@ function registerPlugin(on, skipPlugin = false) {
 
     // find only the tests with TestRail case id in the test name
     const testRailResults = []
+
     results.tests.forEach((result) => {
       const testRailCaseReg = /C(\d+)\s/
       // only look at the test name, not at the suite titles
       const testName = result.title[result.title.length - 1]
-      if (testRailCaseReg.test(testName)) {
+
+      // TestRail doesn't accept result = Untested
+      if (testRailCaseReg.test(testName) && result.state !== 'pending') {
         const testRailResult = {
           case_id: parseInt(testRailCaseReg.exec(testName)[1]),
-          // TestRail status
-          // Passed = 1,
-          // Blocked = 2,
-          // Untested = 3,
-          // Retest = 4,
-          // Failed = 5,
-          // TODO: map all Cypress test states into TestRail status
-          // https://glebbahmutov.com/blog/cypress-test-statuses/
-          status_id: result.state === 'passed' ? 1 : 5,
+          status_id: statuses[result.state] || testRailStatuses.FAILED,
         }
         testRailResults.push(testRailResult)
       }
     })
     if (testRailResults.length) {
       console.log('TestRail results in %s', spec.relative)
-      console.table(testRailResults)
-      return sendTestResults(testRailInfo, runId, testRailResults)
+      console.table(testRailResults, ['case_id', 'status_id'])
+
+      return sendTestResults(testRailInfo, runId, testRailResults).catch(
+        (err) => {
+          console.error('Error sending TestRail results')
+          console.error(err)
+        },
+      )
     }
   })
 }
