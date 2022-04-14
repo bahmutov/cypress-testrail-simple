@@ -4,7 +4,7 @@
 
 > Simple upload of Cypress test results to TestRail
 
-Read the blog post [Cypress And TestRail](https://glebbahmutov.com/blog/cypress-and-testrail/)
+Read the blog post [Cypress And TestRail](https://glebbahmutov.com/blog/cypress-and-testrail/). For testing, [this is a private TestRail project](https://bahmutov.testrail.io/index.php?/suites/view/1).
 
 ## Install
 
@@ -93,6 +93,17 @@ npx testrail-start-run \
   --name "test run" \
   --description "test run description" \
   --spec "cypress/integration/featureA/**.js"
+```
+
+#### --find-specs
+
+You can let this utility find the Cypress specs (via [find-cypress-specs](https://github.com/bahmutov/find-cypress-specs)) and extract the test case IDs. Instead of `--spec` parameter, use `--find-specs` flag.
+
+```
+npx testrail-start-run \
+  --name "test run" \
+  --description "test run description" \
+  --find-specs
 ```
 
 ### testrail-close-run

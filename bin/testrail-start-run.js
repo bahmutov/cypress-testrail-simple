@@ -6,6 +6,7 @@ const arg = require('arg')
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
 const globby = require('globby')
+const findCypressSpecs = require('find-cypress-specs')
 const { getTestRailConfig, getAuthorization } = require('../src/get-config')
 const { findCases } = require('../src/find-cases')
 const { getTestSuite } = require('../src/testrail-api')
@@ -16,6 +17,9 @@ const args = arg(
     '--name': String,
     '--description': String,
     '--suite': String,
+    // find the specs automatically using
+    // https://github.com/bahmutov/find-cypress-specs
+    '--find-specs': Boolean,
     // aliases
     '-s': '--spec',
     '-n': '--name',
@@ -108,7 +112,16 @@ async function startRun({ testRailInfo, name, description, caseIds }) {
     )
 }
 
-if (args['--spec']) {
+if (args['--find-specs']) {
+  const specs = findCypressSpecs.getSpecs()
+  debug('found %d Cypress specs', specs.length)
+  debug(specs)
+  const caseIds = findCases(specs)
+  debug('found %d TestRail case ids: %o', caseIds.length, caseIds)
+
+  const testRailInfo = getTestRailConfig()
+  startRun({ testRailInfo, name, description, caseIds })
+} else if (args['--spec']) {
   findSpecs(args['--spec']).then((specs) => {
     debug('using pattern "%s" found specs', args['--spec'])
     debug(specs)
