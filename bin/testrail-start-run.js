@@ -113,7 +113,7 @@ if (args['--spec']) {
     debug('using pattern "%s" found specs', args['--spec'])
     debug(specs)
     const caseIds = findCases(specs)
-    debug('found TestRail case ids: %o', caseIds)
+    debug('found %d TestRail case ids: %o', caseIds.length, caseIds)
 
     const testRailInfo = getTestRailConfig()
     startRun({ testRailInfo, name, description, caseIds })
