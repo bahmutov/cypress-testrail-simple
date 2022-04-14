@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-describe('parent2', () => {
+describe('parent2', { tags: '@real' }, () => {
   // "context" is just an alias to "describe"
   // both used to group similar tests together
   context('inner2', () => {
