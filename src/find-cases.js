@@ -1,4 +1,5 @@
 const fs = require('fs')
+const { getTestNames } = require('find-test-names')
 
 /**
  * Finds the test case IDs in the test titles.
@@ -6,21 +7,31 @@ const fs = require('fs')
  */
 function findCasesInSpec(spec, readSpec = fs.readFileSync) {
   const source = readSpec(spec, 'utf8')
-  // the test case ID has to be by itself or next to a quote
-  const matches = source.match(/['"` ]C\d+['"` ]/g)
-  if (!matches) {
-    // no case Ids found
-    return []
-  }
-  const cleaned = matches.map((m) => m.replace(/['`\'"C']/g, ''))
-  return cleaned.map(Number)
+
+  const found = getTestNames(source)
+  // a single test case ID per test title for now
+  const ids = found.testNames
+    .map((testName) => {
+      const matches = testName.match(/\bC(?<caseId>\d+)\b/)
+      if (!matches) {
+        return
+      }
+      return Number(matches.groups.caseId)
+    })
+    .filter((id) => !isNaN(id))
+
+  // make sure the test ids are unique
+  return Array.from(new Set(ids))
 }
 
 function findCases(specs, readSpec = fs.readFileSync) {
   // find case Ids in each spec and flatten into a single array
-  return specs
+  const allCaseIds = specs
     .map((spec) => findCasesInSpec(spec, readSpec))
     .reduce((a, b) => a.concat(b), [])
+    .filter((id) => !isNaN(id))
+  const uniqueCaseIds = Array.from(new Set(allCaseIds))
+  return uniqueCaseIds
 }
 
 module.exports = { findCases, findCasesInSpec }

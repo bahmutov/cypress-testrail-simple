@@ -5,7 +5,7 @@ describe('parent', () => {
   // both used to group similar tests together
   context('inner', () => {
     // test rail case ID "1"
-    it('C1 works', () => {
+    it('C1 works', { tags: '@real' }, () => {
       cy.wait(15000)
     })
   })
