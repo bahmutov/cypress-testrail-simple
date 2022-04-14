@@ -1,6 +1,6 @@
 # starts a new TestRail run
 # finds the Cypress specs
-name: find-cases
+name: find-specs
 on: [push]
 jobs:
   tests:

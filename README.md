@@ -4,7 +4,7 @@
 
 > Simple upload of Cypress test results to TestRail
 
-Read the blog post [Cypress And TestRail](https://glebbahmutov.com/blog/cypress-and-testrail/)
+Read the blog post [Cypress And TestRail](https://glebbahmutov.com/blog/cypress-and-testrail/). For testing, [this is a private TestRail project](https://bahmutov.testrail.io/index.php?/suites/view/1).
 
 ## Install
 
