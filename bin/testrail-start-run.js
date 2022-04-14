@@ -2,6 +2,7 @@
 
 // @ts-check
 
+const fs = require('fs')
 const arg = require('arg')
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
@@ -20,6 +21,8 @@ const args = arg(
     // find the specs automatically using
     // https://github.com/bahmutov/find-cypress-specs
     '--find-specs': Boolean,
+    // filter all found specs by the given tag(s)
+    '--tagged': String,
     // do not open the test run, just find everything
     '--dry': Boolean,
     // aliases
@@ -118,7 +121,16 @@ if (args['--find-specs']) {
   const specs = findCypressSpecs.getSpecs()
   debug('found %d Cypress specs', specs.length)
   debug(specs)
-  const caseIds = findCases(specs)
+
+  let tagged
+  if (args['--tagged']) {
+    tagged = args['--tagged']
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    debug('tagged: %o', tagged)
+  }
+  const caseIds = findCases(specs, fs.readFileSync, tagged)
   debug('found %d TestRail case ids: %o', caseIds.length, caseIds)
 
   if (args['--dry']) {

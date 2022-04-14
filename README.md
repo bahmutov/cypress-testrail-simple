@@ -80,6 +80,7 @@ npx testrail-start-run > runId.txt
 - `--description` optional description for the test run, alias `-d`
 - `--suite` optional suite ID, alias `-s`
 - `--spec` optional [globby](https://github.com/sindresorhus/globby#readme) pattern for finding specs, extracting case IDs (using the `C\d+` regular expression), and starting a new TestRail run with those case IDs only. Alias `-s`. This option is very useful if only some test cases are automated using Cypress. See the workflow examples in [.github/workflows/cases.yml](./.github/workflows/cases.yml) and [.circleci/config.yml](./.circleci/config.yml).
+- `--dry` only parses the arguments and finds the test case IDs, but does not trigger the run
 
 ```
 npx testrail-start-run --name "test run" --description "test run description"
@@ -105,6 +106,32 @@ npx testrail-start-run \
   --description "test run description" \
   --find-specs
 ```
+
+#### --tagged
+
+Sometimes you want to pick the tests with a tag to create a new test run. You can use the combination of `--find-specs` and `--tagged tag` to pick only the test case IDs for tests with effective tag "tag"
+
+```
+npx testrail-start-run \
+  --find-specs --tagged @user
+```
+
+You can list several tags, if a test has any one of them, it will be picked.
+
+```js
+// example spec file
+describe('parent', { tags: '@user' }, () => {
+  describe('parent', { tags: '@auth' }, () => {
+    it('C50 works a', { tags: '@one' }, () => {})
+    it('C51 works b', () => {})
+  })
+})
+describe('outside', { tags: '@new' }, () => {
+  it('C101 works c', () => {})
+})
+```
+
+For example, `--find-specs --tagged @new` will only pick the test "works c" to run with its id `101`. If you want to run the authentication tests, you can call `--find-specs --tagged @auth` and it will pick the case IDs `50` and `51`.
 
 ### testrail-close-run
 
