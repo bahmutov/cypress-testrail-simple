@@ -41,6 +41,7 @@
   "dependencies": {
     "arg": "^5.0.1",
     "debug": "^4.3.2",
+    "find-cypress-specs": "^1.17.0",
     "globby": "^11",
     "got": "^11.8.2"
   },

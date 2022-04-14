@@ -95,6 +95,17 @@ npx testrail-start-run \
   --spec "cypress/integration/featureA/**.js"
 ```
 
+#### --find-specs
+
+You can let this utility find the Cypress specs (via [find-cypress-specs](https://github.com/bahmutov/find-cypress-specs)) and extract the test case IDs. Instead of `--spec` parameter, use `--find-specs` flag.
+
+```
+npx testrail-start-run \
+  --name "test run" \
+  --description "test run description" \
+  --find-specs
+```
+
 ### testrail-close-run
 
 To close an open test run, pass the run ID as an argument or in the file `./runId.txt`
