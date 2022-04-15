@@ -77,21 +77,36 @@ function registerPlugin(on, skipPlugin = false) {
     // find only the tests with TestRail case id in the test name
     const testRailResults = []
     results.tests.forEach((result) => {
+      /**
+       *  Cypress to TestRail Status Mapping
+       * 
+       *  | Cypress status | TestRail Status | TestRail Status ID |
+       *  | -------------- | --------------- | ------------------ |
+       *  | Passed         | Passed          | 1                  |
+       *  | N/A            | Blocked         | 2                  |
+       *  | Pending        | Untested        | 3                  |
+       *  | Skipped        | Retest          | 4                  |
+       *  | Failed         | Failed          | 5                  |
+       */
+      const defaultStatus = {
+        passed: 1,
+        pending: 3,
+        skipped: 4,
+        failed: 5,
+      }
+      // override status mapping if defined by user
+      const statusOverride = testRailInfo.statusOverride
+      const status = {
+        ...defaultStatus,
+        ...statusOverride,
+      }
       const testRailCaseReg = /C(\d+)\s/
       // only look at the test name, not at the suite titles
       const testName = result.title[result.title.length - 1]
       if (testRailCaseReg.test(testName)) {
         const testRailResult = {
           case_id: parseInt(testRailCaseReg.exec(testName)[1]),
-          // TestRail status
-          // Passed = 1,
-          // Blocked = 2,
-          // Untested = 3,
-          // Retest = 4,
-          // Failed = 5,
-          // TODO: map all Cypress test states into TestRail status
-          // https://glebbahmutov.com/blog/cypress-test-statuses/
-          status_id: result.state === 'passed' ? 1 : 5,
+          status_id: status[result.state] || defaultStatus.failed,
         }
         testRailResults.push(testRailResult)
       }

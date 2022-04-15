@@ -12,6 +12,14 @@ function hasConfig(env = process.env) {
   )
 }
 
+function safelyParseJson(str) {
+  try {
+      return JSON.parse(str)
+  } catch (e) {
+      return {}
+  }
+}
+
 function getTestRailConfig(env = process.env) {
   const debug = require('debug')('cypress-testrail-simple')
 
@@ -34,6 +42,7 @@ function getTestRailConfig(env = process.env) {
     password: process.env.TESTRAIL_PASSWORD,
     projectId: process.env.TESTRAIL_PROJECTID,
     suiteId: process.env.TESTRAIL_SUITEID,
+    statusOverride: safelyParseJson(process.env.TESTRAIL_STATUS_OVERRIDE),
   }
   debug('test rail info with the password masked')
   debug('%o', { ...testRailInfo, password: '<masked>' })
