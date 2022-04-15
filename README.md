@@ -144,6 +144,10 @@ npx testrail-close-run 60
 npx testrail-close-run
 ```
 
+### testrail-check-case-ids
+
+Prints the list of case IDs for the given project
+
 ## Sending test results
 
 During `cypress run` the plugin can send test results for each test case found in the test title using `C\d+` regular expression. To send the results, you need to set the run ID as an environment variable `TESTRAIL_RUN_ID` or by having it in the file `runId.txt`
