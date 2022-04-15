@@ -31,11 +31,9 @@ jobs:
       - name: Start TestRail Run 🏃🏻‍♂️
         id: testRail
         run: |
-          commitSubject="${{ github.event.commits[0].message }}"
-          runName="Testing cases on GitHub Actions: ${commitSubject}"
+          runName="Testing cases on GitHub Actions in workflow cases"
           runDescription="Cypress tests for commit ${GITHUB_SHA} ${GITHUB_REF}"
 
-          echo ${commitSubject}
           echo ${runName}
           echo ${runDescription}
 
