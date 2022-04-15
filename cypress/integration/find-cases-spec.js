@@ -65,7 +65,7 @@ describe('Finding test case IDs', () => {
       ['file1.js', 'file2.js', 'file3.js', 'file4.js'],
       readFile,
     )
-    expect(ids, 'test cases').to.deep.equal([1, 199, 123])
+    expect(ids, 'test cases').to.deep.equal([1, 123, 199])
   })
 
   it('returns an empty list', () => {
