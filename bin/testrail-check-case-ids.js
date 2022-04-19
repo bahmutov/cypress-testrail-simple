@@ -25,16 +25,18 @@ debug('args: %o', args)
 
 const testRailInfo = getTestRailConfig()
 getProjectCases({ testRailInfo }).then((list) => {
-  debug('TestRail has %d cases', list.length)
+  console.log('TestRail project has %d test cases', list.length)
+
   if (args['--find-specs']) {
     const specs = findCypressSpecs.getSpecs()
-    debug('found %d Cypress specs', specs.length)
+    console.log('found %d Cypress specs', specs.length)
     const caseIds = findCases(specs, fs.readFileSync)
     debug(
       'found %d TestRail case ids in spec files: %o',
       caseIds.length,
       caseIds,
     )
+    console.log('found %d TestRail case ids in spec files', caseIds.length)
 
     // check if the specs files have valid case IDs
     const specFilesExtraIds = caseIds.filter(
@@ -51,6 +53,9 @@ getProjectCases({ testRailInfo }).then((list) => {
 
     // the TestRail project might have more case IDs than the specs files
     // because some test cases might be manual or automated in other projects
+    console.log(
+      'all case IDs found in the spec files are present in the TestRail project ✅',
+    )
   } else {
     console.table(list)
     console.log()
