@@ -35,6 +35,17 @@ getProjectCases({ testRailInfo }).then((list) => {
       caseIds.length,
       caseIds,
     )
+
+    const specFilesExtraIds = caseIds.filter((id) =>
+      list.find((item) => item.id === id),
+    )
+    if (specFilesExtraIds.length) {
+      console.error(
+        'Found %d case IDs in the spec files NOT preset in the TestRail project',
+        specFilesExtraIds.length,
+      )
+      console.error(specFilesExtraIds.join(', '))
+    }
   } else {
     console.table(list)
     console.log()
