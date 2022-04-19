@@ -7,6 +7,11 @@ const got = require('got')
 const { getTestRailConfig, getAuthorization } = require('../src/get-config')
 require('console.table')
 
+/**
+ * Given a TestRail project, finds all test case IDs in the project.
+ * If there are many test cases, fetches them in batches and returns
+ * a combined list, sorted by ID.
+ */
 async function getCases({ testRailInfo }) {
   // only output the run ID to the STDOUT, everything else is logged to the STDERR
   console.error(
@@ -14,49 +19,49 @@ async function getCases({ testRailInfo }) {
     testRailInfo.projectId,
   )
 
+  const testRailApi = `${testRailInfo.host}/index.php?`
+  debug('testRailApi', testRailApi)
+
   // https://www.gurock.com/testrail/docs/api/reference/cases/#getcases
-  const getCasesUrl = `${testRailInfo.host}/index.php?/api/v2/get_cases/${testRailInfo.projectId}&limit=250`
+  const getCasesUrl = `/api/v2/get_cases/${testRailInfo.projectId}&limit=200`
   debug('get cases url: %s', getCasesUrl)
   const authorization = getAuthorization(testRailInfo)
 
-  // @ts-ignore
-  return (
-    got(getCasesUrl, {
+  // we will store the result in this list
+  const allCases = []
+
+  async function getCasesPart(url) {
+    // @ts-ignore
+    const json = await got(testRailApi + url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         authorization,
       },
+    }).json()
+
+    debug('response from the get_cases')
+    debug('%o', json)
+    const { cases } = json
+    const list = cases.map((c) => {
+      return {
+        id: c.id,
+        title: c.title,
+      }
     })
-      .json()
-      .then(
-        (json) => {
-          debug('response from the get_cases')
-          debug('%o', json)
-          const { cases } = json
-          const list = cases.map((c) => {
-            return {
-              id: c.id,
-              title: c.title,
-            }
-          })
-          return list
-        },
-        (error) => {
-          console.error(
-            'Could not get cases for TestRail project',
-            testRailInfo.projectId,
-          )
-          console.error('Response: %s', error.name)
-          console.error('Please check your TestRail configuration')
-          process.exit(1)
-        },
-      )
-      // make sure the test cases are sorted by ID
-      .then((list) => {
-        return list.sort((c1, c2) => c1.id - c2.id)
-      })
-  )
+    allCases.push(...list)
+
+    if (json._links && json._links.next) {
+      await getCasesPart(json._links.next)
+    }
+  }
+
+  await getCasesPart(getCasesUrl)
+
+  // make sure the test cases are sorted by ID
+  allCases.sort((c1, c2) => c1.id - c2.id)
+
+  return allCases
 }
 
 const testRailInfo = getTestRailConfig()
