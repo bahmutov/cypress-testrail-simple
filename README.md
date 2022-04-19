@@ -146,7 +146,17 @@ npx testrail-close-run
 
 ### testrail-check-case-ids
 
-Prints the list of case IDs for the given project
+Prints the list of case IDs for the given TestRail project and optionally verifies them against the IDs found in the Cypress spec files
+
+```text
+# just print the list of TestRail cases and titles
+$ npx testrail-check-case-ids
+# compare the case IDs in the Cypress specs
+# against the TestRail project
+$ npx testrail-check-case-ids --find-specs
+```
+
+When comparing the cases in the spec files against the TestRail project, if there are extra case IDs found in the spec files, the script exits with code 1.
 
 ## Sending test results
 

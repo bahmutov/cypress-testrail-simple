@@ -36,8 +36,9 @@ getProjectCases({ testRailInfo }).then((list) => {
       caseIds,
     )
 
-    const specFilesExtraIds = caseIds.filter((id) =>
-      list.find((item) => item.id === id),
+    // check if the specs files have valid case IDs
+    const specFilesExtraIds = caseIds.filter(
+      (id) => !list.find((item) => item.id === id),
     )
     if (specFilesExtraIds.length) {
       console.error(
@@ -45,7 +46,11 @@ getProjectCases({ testRailInfo }).then((list) => {
         specFilesExtraIds.length,
       )
       console.error(specFilesExtraIds.join(', '))
+      process.exit(1)
     }
+
+    // the TestRail project might have more case IDs than the specs files
+    // because some test cases might be manual or automated in other projects
   } else {
     console.table(list)
     console.log()

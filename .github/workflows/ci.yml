@@ -27,6 +27,14 @@ jobs:
         with:
           runTests: false
 
+      # verify that all case IDs in the spec files are valid
+      # for this TestRail project
+      - name: Check case IDs 🔎
+        run: |
+          runId=$(node ./bin/testrail-check-case-ids.js --find-specs)
+        env:
+          DEBUG: cypress-testrail-simple
+
       # you can pass GitHub information in the name and description
       # to include in the TestRail run information
       # https://docs.github.com/en/actions/learn-github-actions/contexts
