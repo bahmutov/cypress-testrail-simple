@@ -202,6 +202,48 @@ $ as-a . node ./bin/testrail-start-run.js --spec 'cypress/integration/\*.js'
 
 Because [cypress-testrail-reporter](https://github.com/Vivify-Ideas/cypress-testrail-reporter) is broken in a variety of ways and does not let me open issues to report the problems.
 
+## Migration
+
+### v1 to v2
+
+The config plugin registration function used to take 2 parameters (it is unclear from the tests)
+
+```js
+// v1
+// cypress/plugins/index.js
+module.exports = (on, config) => {
+  // https://github.com/bahmutov/cypress-testrail-simple
+  require('cypress-testrail-simple/src/plugin')(on)
+}
+```
+
+In the second version, we need to pass both the `on` and the `config` parameters
+
+```js
+// v2
+// cypress/plugins/index.js
+module.exports = (on, config) => {
+  // https://github.com/bahmutov/cypress-testrail-simple
+  require('cypress-testrail-simple/src/plugin')(on, config)
+}
+```
+
+If you want to skip the plugin's registration step, pass the 3rd argument
+
+```js
+// v2
+// cypress/plugins/index.js
+module.exports = (on, config) => {
+  const skipPluginRegistration = true
+  // https://github.com/bahmutov/cypress-testrail-simple
+  require('cypress-testrail-simple/src/plugin')(
+    on,
+    config,
+    skipPluginRegistration,
+  )
+}
+```
+
 ## Small print
 
 Author: Gleb Bahmutov &lt;gleb.bahmutov@gmail.com&gt; &copy; 2021
