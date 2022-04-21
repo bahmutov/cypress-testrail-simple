@@ -144,6 +144,11 @@ npx testrail-close-run 60
 npx testrail-close-run
 ```
 
+This script allows two explicit parameters:
+
+- `--run <run ID>` to pass the run ID to close
+- `--force` to skip checking if the test run has all the tests completed
+
 ### testrail-check-case-ids
 
 Prints the list of case IDs for the given TestRail project and optionally verifies them against the IDs found in the Cypress spec files
