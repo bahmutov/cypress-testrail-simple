@@ -12,7 +12,7 @@ describe('parent2', { tags: '@real' }, () => {
     })
   })
 
-  it('tests C103 regression', () => {
+  it('tests C103 regression', { tags: '@regression' }, () => {
     cy.wait(10000)
   })
 })

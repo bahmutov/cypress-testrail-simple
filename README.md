@@ -160,6 +160,8 @@ When comparing the cases in the spec files against the TestRail project, if ther
 
 ## Testing locally
 
+### Run with all case IDs found from the specs
+
 1. create a new test run
 
 ```
@@ -181,6 +183,31 @@ as-a . npx cypress run --env testRailRunId=635
 
 ```
 as-a . node ./bin/testrail-close-run 635
+```
+
+### Run with tagged tests
+
+1. create a new test run for tests tagged "@regression"
+
+```
+as-a . node ./bin/testrail-start-run \
+  --name "local test run for tag @regression" \
+  --description "test run description" \
+  --find-specs --tagged @regression
+```
+
+Prints the new test run ID, for example `662`
+
+2. Run the tests
+
+```
+as-a . npx cypress run --env testRailRunId=662
+```
+
+3. Close the TestRail run
+
+```
+as-a . node ./bin/testrail-close-run 662
 ```
 
 ## Sending test results
