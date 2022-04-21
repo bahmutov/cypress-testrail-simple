@@ -38,17 +38,18 @@ async function sendTestResults(testRailInfo, runId, testResults) {
  * Registers the cypress-testrail-simple plugin.
  * @example
  *  module.exports = (on, config) => {
- *   require('cypress-testrail-simple/src/plugin')(on)
+ *   require('cypress-testrail-simple/src/plugin')(on, config)
  *  }
  * @example
  *  Skip the plugin
  *  module.exports = (on, config) => {
- *   require('cypress-testrail-simple/src/plugin')(on, true)
+ *   require('cypress-testrail-simple/src/plugin')(on, config, true)
  *  }
  * @param {Cypress.PluginEvents} on Event registration function from Cypress
+ * @param {Cypress.PluginConfigOptions} config Cypress configuration object
  * @param {Boolean} skipPlugin If true, skips loading the plugin. Defaults to false
  */
-function registerPlugin(on, skipPlugin = false) {
+function registerPlugin(on, config, skipPlugin = false) {
   if (skipPlugin === true) {
     debug('the user explicitly disabled the plugin')
     return
@@ -79,7 +80,7 @@ function registerPlugin(on, skipPlugin = false) {
     results.tests.forEach((result) => {
       /**
        *  Cypress to TestRail Status Mapping
-       * 
+       *
        *  | Cypress status | TestRail Status | TestRail Status ID |
        *  | -------------- | --------------- | ------------------ |
        *  | Passed         | Passed          | 1                  |

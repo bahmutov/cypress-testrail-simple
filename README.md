@@ -23,7 +23,7 @@ Add the plugin to your Cypress plugin file
 // cypress/plugins/index.js
 module.exports = (on, config) => {
   // https://github.com/bahmutov/cypress-testrail-simple
-  require('cypress-testrail-simple/src/plugin')(on)
+  require('cypress-testrail-simple/src/plugin')(on, config)
 }
 ```
 
@@ -48,7 +48,7 @@ If these variables are present, we assume the user wants to use the plugin. You 
 ```js
 module.exports = (on, config) => {
   // skip loading the plugin
-  require('cypress-testrail-simple/src/plugin')(on, true)
+  require('cypress-testrail-simple/src/plugin')(on, config, true)
 }
 ```
 
@@ -158,6 +158,25 @@ $ npx testrail-check-case-ids --find-specs
 
 When comparing the cases in the spec files against the TestRail project, if there are extra case IDs found in the spec files, the script exits with code 1.
 
+## Testing locally
+
+1. create a new test run
+
+```
+as-a . node ./bin/testrail-start-run \
+  --name "local test run" \
+  --description "test run description" \
+  --find-specs
+```
+
+2. Run the tests
+
+```
+as-a . npx cypress run
+```
+
+Prints the new test run ID, for example `635`
+
 ## Sending test results
 
 During `cypress run` the plugin can send test results for each test case found in the test title using `C\d+` regular expression. To send the results, you need to set the run ID as an environment variable `TESTRAIL_RUN_ID` or by having it in the file `runId.txt`
@@ -174,7 +193,9 @@ This tool uses [debug](https://github.com/visionmedia/debug#readme) to output ve
 To start a new test rail run locally and see how the new run is created
 
 ```
-$ as-a . node ./bin/testrail-start-run.js --spec 'cypress/integration/*.js'
+
+$ as-a . node ./bin/testrail-start-run.js --spec 'cypress/integration/\*.js'
+
 ```
 
 ## Why?
@@ -224,3 +245,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 [renovate-badge]: https://img.shields.io/badge/renovate-app-blue.svg
 [renovate-app]: https://renovateapp.com/
+
+```
+
+```
