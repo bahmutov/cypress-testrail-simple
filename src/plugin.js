@@ -113,11 +113,18 @@ async function registerPlugin(on, config, skipPlugin = false) {
       // only look at the test name, not at the suite titles
       const testName = result.title[result.title.length - 1]
       if (testRailCaseReg.test(testName)) {
+        const case_id = parseInt(testRailCaseReg.exec(testName)[1])
+        const status_id = status[result.state] || defaultStatus.failed
         const testRailResult = {
-          case_id: parseInt(testRailCaseReg.exec(testName)[1]),
-          status_id: status[result.state] || defaultStatus.failed,
+          case_id,
+          status_id,
         }
-        testRailResults.push(testRailResult)
+
+        if (caseIds.length && !caseIds.includes(case_id)) {
+          debug('case %d is not in test run %d', case_id, runId)
+        } else {
+          testRailResults.push(testRailResult)
+        }
       }
     })
     if (testRailResults.length) {
