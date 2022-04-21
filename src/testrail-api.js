@@ -45,40 +45,52 @@ async function getTestRun(runId, testRailInfo) {
  * Each result is an object with a case ID and a status ID.
  */
 async function getTestRunResults(runId, testRailInfo) {
-  // TODO: the API is limited to 250 test results per request
+  const testRailApi = `${testRailInfo.host}/index.php?`
+  debug('testRailApi', testRailApi)
+
   // if there are more test results, need to call the API multiple times
   // and combine the results
-  const closeRunUrl = `${testRailInfo.host}/index.php?/api/v2/get_tests/${runId}`
-  debug('get run url: %s', closeRunUrl)
+  const runResultsUrl = `/api/v2/get_tests/${runId}`
+  debug('initial run results url: %s', runResultsUrl)
   const authorization = getAuthorization(testRailInfo)
 
-  // @ts-ignore
-  const json = await got(closeRunUrl, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization,
-    },
-  }).json()
+  // we will store the result in this list
+  const allCases = []
 
-  debug(
-    'get %d test results for test run %d response',
-    json.tests.length,
-    runId,
-  )
+  async function getPartResults(url) {
+    debug('fetching %s', url)
+    // @ts-ignore
+    const json = await got(testRailApi + url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization,
+      },
+    }).json()
 
-  const cases = json.tests.map((t) => {
-    const status = TestRailStatusName[t.status_id]
-    if (!status) {
-      console.error('Unknown TestRail test status %s', t.status_id)
+    debug('get %d test results for test run %d', json.tests.length, runId)
+
+    const cases = json.tests.map((t) => {
+      const status = TestRailStatusName[t.status_id]
+      if (!status) {
+        console.error('Unknown TestRail test status %s', t.status_id)
+      }
+      return {
+        case_id: t.case_id,
+        status: status,
+      }
+    })
+
+    allCases.push(...cases)
+
+    if (json._links && json._links.next) {
+      await getPartResults(json._links.next)
     }
-    return {
-      case_id: t.case_id,
-      status: status,
-    }
-  })
+  }
 
-  return cases
+  await getPartResults(runResultsUrl)
+
+  return allCases
 }
 
 async function closeTestRun(runId, testRailInfo) {
