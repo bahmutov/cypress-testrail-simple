@@ -93,6 +93,14 @@ async function getTestRunResults(runId, testRailInfo) {
   return allCases
 }
 
+/**
+ * Returns just the list of case IDs listed in the given TestRail test run
+ */
+async function getCasesInTestRun(runId, testRailInfo) {
+  const cases = await getTestRunResults(runId, testRailInfo)
+  return cases.map((c) => c.case_id)
+}
+
 async function closeTestRun(runId, testRailInfo) {
   console.log(
     'closing the TestRail run %d for project %s',
@@ -147,4 +155,5 @@ module.exports = {
   closeTestRun,
   getTestSuite,
   getTestRunResults,
+  getCasesInTestRun,
 }

@@ -8,7 +8,8 @@ const {
   getTestRailConfig,
   getAuthorization,
   getTestRunId,
-} = require('../src/get-config')
+} = require('./get-config')
+const { getCasesInTestRun } = require('./testrail-api')
 
 async function sendTestResults(testRailInfo, runId, testResults) {
   debug(
@@ -49,7 +50,7 @@ async function sendTestResults(testRailInfo, runId, testResults) {
  * @param {Cypress.PluginConfigOptions} config Cypress configuration object
  * @param {Boolean} skipPlugin If true, skips loading the plugin. Defaults to false
  */
-function registerPlugin(on, config, skipPlugin = false) {
+async function registerPlugin(on, config, skipPlugin = false) {
   if (skipPlugin === true) {
     debug('the user explicitly disabled the plugin')
     return
@@ -65,6 +66,10 @@ function registerPlugin(on, config, skipPlugin = false) {
   if (!runId) {
     throw new Error('Missing test rail run ID')
   }
+
+  const caseIds = await getCasesInTestRun(runId, testRailInfo)
+  debug('test run %d has %d cases', runId, caseIds.length)
+  debug(caseIds)
 
   // should we ignore test results if running in the interactive mode?
   // right now these callbacks only happen in the non-interactive mode
@@ -108,11 +113,18 @@ function registerPlugin(on, config, skipPlugin = false) {
       // only look at the test name, not at the suite titles
       const testName = result.title[result.title.length - 1]
       if (testRailCaseReg.test(testName)) {
+        const case_id = parseInt(testRailCaseReg.exec(testName)[1])
+        const status_id = status[result.state] || defaultStatus.failed
         const testRailResult = {
-          case_id: parseInt(testRailCaseReg.exec(testName)[1]),
-          status_id: status[result.state] || defaultStatus.failed,
+          case_id,
+          status_id,
         }
-        testRailResults.push(testRailResult)
+
+        if (caseIds.length && !caseIds.includes(case_id)) {
+          debug('case %d is not in test run %d', case_id, runId)
+        } else {
+          testRailResults.push(testRailResult)
+        }
       }
     })
     if (testRailResults.length) {
