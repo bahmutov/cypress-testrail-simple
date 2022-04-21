@@ -133,6 +133,16 @@ describe('outside', { tags: '@new' }, () => {
 
 For example, `--find-specs --tagged @new` will only pick the test "works c" to run with its id `101`. If you want to run the authentication tests, you can call `--find-specs --tagged @auth` and it will pick the case IDs `50` and `51`.
 
+### testrail-run-results
+
+Shows the TestRail run results
+
+```
+npx testrail-run-results --run 60
+```
+
+Prints a table with test cases
+
 ### testrail-close-run
 
 To close an open test run, pass the run ID as an argument or in the file `./runId.txt`

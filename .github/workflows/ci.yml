@@ -67,6 +67,11 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           # DEBUG: cypress-testrail-simple
 
+      - name: Print TestRail run results 📋
+        if: ${{ always() }}
+        run: |
+          node ./bin/testrail-run-results.js --run ${{ steps.testRail.outputs.runId }}
+
       - name: Close TestRail Run 🏁
         # always close the test run, even if the previous steps have failed
         if: ${{ always() }}
