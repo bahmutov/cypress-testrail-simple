@@ -48,6 +48,7 @@ getTestRun(runId, testRailInfo).then((runInfo) => {
       console.log('description: %s', json.description)
       console.log('passed tests: %d', json.passed_count)
       console.log('failed tests: %d', json.failed_count)
+      console.log('blocked (pending) tests: %d', json.blocked_count)
       // untested count should be zero
       console.log('untested: %d', json.untested_count)
     },

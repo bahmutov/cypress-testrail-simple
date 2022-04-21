@@ -83,15 +83,18 @@ function registerPlugin(on, config, skipPlugin = false) {
        *
        *  | Cypress status | TestRail Status | TestRail Status ID |
        *  | -------------- | --------------- | ------------------ |
+       *  | created        | Untested        | 3                  |
        *  | Passed         | Passed          | 1                  |
-       *  | N/A            | Blocked         | 2                  |
-       *  | Pending        | Untested        | 3                  |
+       *  | Pending        | Blocked         | 2                  |
        *  | Skipped        | Retest          | 4                  |
        *  | Failed         | Failed          | 5                  |
+       *
+       *  Each test starts as "Untested" in TestRail.
+       *  @see https://glebbahmutov.com/blog/cypress-test-statuses/
        */
       const defaultStatus = {
         passed: 1,
-        pending: 3,
+        pending: 2,
         skipped: 4,
         failed: 5,
       }
