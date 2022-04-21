@@ -14,9 +14,9 @@ function hasConfig(env = process.env) {
 
 function safelyParseJson(str) {
   try {
-      return JSON.parse(str)
+    return JSON.parse(str)
   } catch (e) {
-      return {}
+    return {}
   }
 }
 
@@ -57,12 +57,20 @@ function getAuthorization(testRailInfo) {
   return authorization
 }
 
-function getTestRunId(env = process.env) {
-  // first, try to read the test run id from the environment
+function getTestRunId(config, env = process.env) {
+  // try the Cypress env object
+  if (config) {
+    if (typeof config.env.testRailRunId === 'number') {
+      return config.env.testRailRunId
+    }
+  }
+
+  // try to read the test run id from the environment
   if ('TESTRAIL_RUN_ID' in env) {
     return parseInt(env.TESTRAIL_RUN_ID)
   }
 
+  // try the "runId.txt" text file
   const filename = path.join(process.cwd(), 'runId.txt')
   debug('checking file %s', filename)
 

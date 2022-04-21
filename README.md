@@ -169,17 +169,37 @@ as-a . node ./bin/testrail-start-run \
   --find-specs
 ```
 
+Prints the new test run ID, for example `635`
+
 2. Run the tests
 
 ```
-as-a . npx cypress run
+as-a . npx cypress run --env testRailRunId=635
 ```
 
-Prints the new test run ID, for example `635`
+3. Close the TestRail run
+
+```
+as-a . node ./bin/testrail-close-run 635
+```
 
 ## Sending test results
 
-During `cypress run` the plugin can send test results for each test case found in the test title using `C\d+` regular expression. To send the results, you need to set the run ID as an environment variable `TESTRAIL_RUN_ID` or by having it in the file `runId.txt`
+During `cypress run` the plugin can send test results for each test case found in the test title using `C\d+` regular expression. To send the results, you need to pass the TestRail run ID. There are several was of doing this:
+
+- pass the run ID as an environment variable `TESTRAIL_RUN_ID`
+
+```
+$ TESTRAIL_RUN_ID=635 npx cypress run
+```
+
+- pass it via Cypress env value `testRailRunId`
+
+```
+$ npx cypress run --env testRailRunId=635
+```
+
+- read it from the text file `runId.txt` (written there by the `testrail-start-run` script)
 
 ## Examples
 

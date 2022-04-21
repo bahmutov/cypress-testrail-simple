@@ -61,7 +61,7 @@ function registerPlugin(on, config, skipPlugin = false) {
   }
 
   const testRailInfo = getTestRailConfig()
-  const runId = getTestRunId()
+  const runId = getTestRunId(config)
   if (!runId) {
     throw new Error('Missing test rail run ID')
   }

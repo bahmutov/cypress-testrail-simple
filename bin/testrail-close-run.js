@@ -10,7 +10,7 @@ let runId
 const runIdStr = process.argv[2]
 if (!runIdStr) {
   debug('TestRail run id not passed via CLI, trying the file')
-  runId = getTestRunId()
+  runId = getTestRunId(null)
 } else {
   runId = parseInt(runIdStr, 10)
 }
