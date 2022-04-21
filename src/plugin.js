@@ -8,7 +8,8 @@ const {
   getTestRailConfig,
   getAuthorization,
   getTestRunId,
-} = require('../src/get-config')
+} = require('./get-config')
+const { getCasesInTestRun } = require('./testrail-api')
 
 async function sendTestResults(testRailInfo, runId, testResults) {
   debug(
@@ -49,7 +50,7 @@ async function sendTestResults(testRailInfo, runId, testResults) {
  * @param {Cypress.PluginConfigOptions} config Cypress configuration object
  * @param {Boolean} skipPlugin If true, skips loading the plugin. Defaults to false
  */
-function registerPlugin(on, config, skipPlugin = false) {
+async function registerPlugin(on, config, skipPlugin = false) {
   if (skipPlugin === true) {
     debug('the user explicitly disabled the plugin')
     return
@@ -65,6 +66,10 @@ function registerPlugin(on, config, skipPlugin = false) {
   if (!runId) {
     throw new Error('Missing test rail run ID')
   }
+
+  const caseIds = await getCasesInTestRun(runId, testRailInfo)
+  debug('test run %d has %d cases', runId, caseIds.length)
+  debug(caseIds)
 
   // should we ignore test results if running in the interactive mode?
   // right now these callbacks only happen in the non-interactive mode
