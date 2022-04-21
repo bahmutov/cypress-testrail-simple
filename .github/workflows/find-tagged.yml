@@ -47,6 +47,11 @@ jobs:
           # save the run ID as the output from this step
           echo "::set-output name=runId::${runId}"
 
+      - name: Print TestRail run results 📋
+        if: ${{ always() }}
+        run: |
+          node ./bin/testrail-run-results.js --run ${{ steps.testRail.outputs.runId }}
+
       - name: Cypress tests 🧪
         uses: cypress-io/github-action@v2
         with:
@@ -58,6 +63,11 @@ jobs:
         env:
           TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.runId }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+
+      - name: Print TestRail run results 📋
+        if: ${{ always() }}
+        run: |
+          node ./bin/testrail-run-results.js --run ${{ steps.testRail.outputs.runId }}
 
       - name: Close TestRail Run 🏁
         # always close the test run, even if the previous steps have failed
