@@ -306,6 +306,30 @@ module.exports = (on, config) => {
 }
 ```
 
+### v2 to v3
+
+The plugin registration function has changed from synchronous to `async`. This means _your Cypress plugin file_ also needs to be marked `async` and await the registration.
+
+```js
+// v2
+// cypress/plugins/index.js
+module.exports = (on, config) => {
+  // https://github.com/bahmutov/cypress-testrail-simple
+  require('cypress-testrail-simple/src/plugin')(on, config)
+}
+```
+
+Now
+
+```js
+// v3
+// cypress/plugins/index.js
+module.exports = async (on, config) => {
+  // https://github.com/bahmutov/cypress-testrail-simple
+  await require('cypress-testrail-simple/src/plugin')(on, config)
+}
+```
+
 ## Small print
 
 Author: Gleb Bahmutov &lt;gleb.bahmutov@gmail.com&gt; &copy; 2021
