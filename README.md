@@ -21,9 +21,9 @@ Add the plugin to your Cypress plugin file
 
 ```js
 // cypress/plugins/index.js
-module.exports = (on, config) => {
+module.exports = async (on, config) => {
   // https://github.com/bahmutov/cypress-testrail-simple
-  require('cypress-testrail-simple/src/plugin')(on, config)
+  await require('cypress-testrail-simple/src/plugin')(on, config)
 }
 ```
 
@@ -46,9 +46,9 @@ TESTRAIL_SUITEID=...
 If these variables are present, we assume the user wants to use the plugin. You can disable the plugin by passing an argument
 
 ```js
-module.exports = (on, config) => {
+module.exports = async (on, config) => {
   // skip loading the plugin
-  require('cypress-testrail-simple/src/plugin')(on, config, true)
+  await require('cypress-testrail-simple/src/plugin')(on, config, true)
 }
 ```
 
@@ -255,10 +255,12 @@ This tool uses [debug](https://github.com/visionmedia/debug#readme) to output ve
 To start a new test rail run locally and see how the new run is created
 
 ```
-
 $ as-a . node ./bin/testrail-start-run.js --spec 'cypress/integration/\*.js'
-
 ```
+
+Make sure this plugin is registered correctly in your `cypress/plugins/index.js` file and the plugin function is declared with the `async` keyword in v3. During the test run, you should see messages like this after each spec
+
+![Sending test results to TestRail](./images/logs.png)
 
 ## Why?
 
