@@ -220,8 +220,8 @@ function getTestComments(caseId, displayError) {
 }
 
 function formatComment(displayError, comment = '') {
-  return `<code>${comment}
-  ${displayError}</code>`
+  return `${comment}
+  ${displayError}`
 }
 
 module.exports = registerPlugin
