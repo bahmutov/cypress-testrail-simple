@@ -1,4 +1,7 @@
-name: ci
+# starts a new TestRail run
+# finds the Cypress specs and picks test case ids
+# for tests tagged @a
+name: find-tagged
 on: [push]
 jobs:
   tests:
@@ -11,13 +14,10 @@ jobs:
       TESTRAIL_PASSWORD: ${{secrets.TESTRAIL_PASSWORD}}
       # the project ID is not that secret
       TESTRAIL_PROJECTID: 1
+      # for debugging the scripts in this package
+      DEBUG: cypress-testrail-simple
 
     steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
-        run: echo "$GITHUB_CONTEXT"
-
       - name: Checkout 🛎
         uses: actions/checkout@v2
 
@@ -27,45 +27,42 @@ jobs:
         with:
           runTests: false
 
-      # verify that all case IDs in the spec files are valid
-      # for this TestRail project
-      - name: Check case IDs 🔎
-        run: |
-          runId=$(node ./bin/testrail-check-case-ids.js --find-specs)
-        env:
-          DEBUG: cypress-testrail-simple
-
       # you can pass GitHub information in the name and description
       # to include in the TestRail run information
       # https://docs.github.com/en/actions/learn-github-actions/contexts
       - name: Start TestRail Run 🏃🏻‍♂️
         id: testRail
         run: |
-          commitSubject="${{ github.event.commits[0].message }}"
-          runName="Testing on GitHub Actions: ${commitSubject}"
+          runName="Testing cases on GitHub Actions in find-tagged"
           runDescription="Cypress tests for commit ${GITHUB_SHA} ${GITHUB_REF}"
 
-          echo ${commitSubject}
           echo ${runName}
           echo ${runDescription}
 
-          runId=$(node ./bin/testrail-start-run.js "${runName}" "${runDescription}")
+          runId=$(node ./bin/testrail-start-run.js \
+            --find-specs --tagged @a \
+            --name "${runName}" \
+            --description "${runDescription}")
           echo "TestRail run id ${runId}"
           # save the run ID as the output from this step
           echo "::set-output name=runId::${runId}"
-        env:
-          DEBUG: cypress-testrail-simple
+
+      - name: Print TestRail run results 📋
+        if: ${{ always() }}
+        run: |
+          node ./bin/testrail-run-results.js --run ${{ steps.testRail.outputs.runId }}
 
       - name: Cypress tests 🧪
         uses: cypress-io/github-action@v2
         with:
           install-command: echo "Already installed"
           record: true
-          group: GitHub Actions
+          group: Find Cases
+          # the test tagged @a is only in the spec-a.js
+          spec: cypress/integration/spec-a.js
         env:
           TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.runId }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          # DEBUG: cypress-testrail-simple
 
       - name: Print TestRail run results 📋
         if: ${{ always() }}
@@ -77,11 +74,3 @@ jobs:
         if: ${{ always() }}
         run: |
           node ./bin/testrail-close-run.js ${{ steps.testRail.outputs.runId }}
-
-      - name: Semantic Release 🚀
-        uses: cycjimmy/semantic-release-action@v2
-        env:
-          # github token is automatically created by the GH Action workflow
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # created using semantic-release
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

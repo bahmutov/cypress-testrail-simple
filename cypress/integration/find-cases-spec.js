@@ -26,8 +26,8 @@ describe('Finding test case IDs', () => {
     `
     const readFile = cy.stub().returns(source)
     const filename = 'test-spec.js'
-    const ids = findCasesInSpec(filename, readFile)
-    expect(ids, 'test cases').to.deep.equal([1, 2002, 199, 123, 456])
+    const ids = findCasesInSpec(filename, readFile).sort()
+    expect(ids, 'test cases').to.deep.equal([1, 123, 199, 2002, 456])
     expect(readFile).to.be.calledOnceWithExactly(filename, 'utf8')
   })
 
@@ -61,8 +61,11 @@ describe('Finding test case IDs', () => {
     readFile.withArgs('file2.js', 'utf8').returns(source2)
     readFile.withArgs('file3.js', 'utf8').returns(source3)
     readFile.withArgs('file4.js', 'utf8').returns(source4)
-    const ids = findCases(['file1.js', 'file2.js', 'file3.js', 'file4.js'], readFile)
-    expect(ids, 'test cases').to.deep.equal([1, 199, 123])
+    const ids = findCases(
+      ['file1.js', 'file2.js', 'file3.js', 'file4.js'],
+      readFile,
+    )
+    expect(ids, 'test cases').to.deep.equal([1, 123, 199])
   })
 
   it('returns an empty list', () => {
@@ -88,9 +91,13 @@ describe('Finding test case IDs', () => {
 
   it('can be in different quotes', () => {
     const source = `
-      "C1"
-      'C2'
-      \`C3\`
+      it("C1")
+
+      it('C2', () => {})
+
+      it(\`C3\`, () => {
+        // works
+      })
     `
     const readFile = cy.stub().returns(source)
     const filename = 'test-spec.js'

@@ -12,6 +12,14 @@ function hasConfig(env = process.env) {
   )
 }
 
+function safelyParseJson(str) {
+  try {
+    return JSON.parse(str)
+  } catch (e) {
+    return {}
+  }
+}
+
 function getTestRailConfig(env = process.env) {
   const debug = require('debug')('cypress-testrail-simple')
 
@@ -34,6 +42,7 @@ function getTestRailConfig(env = process.env) {
     password: process.env.TESTRAIL_PASSWORD,
     projectId: process.env.TESTRAIL_PROJECTID,
     suiteId: process.env.TESTRAIL_SUITEID,
+    statusOverride: safelyParseJson(process.env.TESTRAIL_STATUS_OVERRIDE),
   }
   debug('test rail info with the password masked')
   debug('%o', { ...testRailInfo, password: '<masked>' })
@@ -48,12 +57,20 @@ function getAuthorization(testRailInfo) {
   return authorization
 }
 
-function getTestRunId(env = process.env) {
-  // first, try to read the test run id from the environment
+function getTestRunId(config, env = process.env) {
+  // try the Cypress env object
+  if (config) {
+    if (typeof config.env.testRailRunId === 'number') {
+      return config.env.testRailRunId
+    }
+  }
+
+  // try to read the test run id from the environment
   if ('TESTRAIL_RUN_ID' in env) {
     return parseInt(env.TESTRAIL_RUN_ID)
   }
 
+  // try the "runId.txt" text file
   const filename = path.join(process.cwd(), 'runId.txt')
   debug('checking file %s', filename)
 

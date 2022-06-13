@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-describe('parent2', () => {
+describe('parent2', { tags: '@real' }, () => {
   // "context" is just an alias to "describe"
   // both used to group similar tests together
   context('inner2', () => {
@@ -12,7 +12,7 @@ describe('parent2', () => {
     })
   })
 
-  it('tests C103 regression', () => {
+  it('tests C103 regression', { tags: '@regression' }, () => {
     cy.wait(10000)
   })
 })

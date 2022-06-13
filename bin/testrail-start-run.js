@@ -2,10 +2,12 @@
 
 // @ts-check
 
+const fs = require('fs')
 const arg = require('arg')
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
 const globby = require('globby')
+const findCypressSpecs = require('find-cypress-specs')
 const { getTestRailConfig, getAuthorization } = require('../src/get-config')
 const { findCases } = require('../src/find-cases')
 const { getTestSuite } = require('../src/testrail-api')
@@ -16,6 +18,13 @@ const args = arg(
     '--name': String,
     '--description': String,
     '--suite': String,
+    // find the specs automatically using
+    // https://github.com/bahmutov/find-cypress-specs
+    '--find-specs': Boolean,
+    // filter all found specs by the given tag(s)
+    '--tagged': String,
+    // do not open the test run, just find everything
+    '--dry': Boolean,
     // aliases
     '-s': '--spec',
     '-n': '--name',
@@ -108,12 +117,34 @@ async function startRun({ testRailInfo, name, description, caseIds }) {
     )
 }
 
-if (args['--spec']) {
+if (args['--find-specs']) {
+  const specs = findCypressSpecs.getSpecs()
+  debug('found %d Cypress specs', specs.length)
+  debug(specs)
+
+  let tagged
+  if (args['--tagged']) {
+    tagged = args['--tagged']
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    debug('tagged: %o', tagged)
+  }
+  const caseIds = findCases(specs, fs.readFileSync, tagged)
+  debug('found %d TestRail case ids: %o', caseIds.length, caseIds)
+
+  if (args['--dry']) {
+    console.log('Dry run, not starting a new run')
+  } else {
+    const testRailInfo = getTestRailConfig()
+    startRun({ testRailInfo, name, description, caseIds })
+  }
+} else if (args['--spec']) {
   findSpecs(args['--spec']).then((specs) => {
     debug('using pattern "%s" found specs', args['--spec'])
     debug(specs)
     const caseIds = findCases(specs)
-    debug('found TestRail case ids: %o', caseIds)
+    debug('found %d TestRail case ids: %o', caseIds.length, caseIds)
 
     const testRailInfo = getTestRailConfig()
     startRun({ testRailInfo, name, description, caseIds })
