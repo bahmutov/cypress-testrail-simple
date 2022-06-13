@@ -11,7 +11,7 @@ const {
   getTestRailConfig,
   getAuthorization,
   getTestRunId,
-} = require('./src/get-config')
+} = require('./get-config')
 const { getCasesInTestRun } = require('./testrail-api')
 
 /**
