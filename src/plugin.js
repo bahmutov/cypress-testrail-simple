@@ -14,6 +14,27 @@ const {
 } = require('../src/get-config')
 const { getCasesInTestRun } = require('./testrail-api')
 
+/**
+ *  Cypress to TestRail Status Mapping
+ *
+ *  | Cypress status | TestRail Status | TestRail Status ID |
+ *  | -------------- | --------------- | ------------------ |
+ *  | created        | Untested        | 3                  |
+ *  | Passed         | Passed          | 1                  |
+ *  | Pending        | Blocked         | 2                  |
+ *  | Skipped        | Retest          | 4                  |
+ *  | Failed         | Failed          | 5                  |
+ *
+ *  Each test starts as "Untested" in TestRail.
+ *  @see https://glebbahmutov.com/blog/cypress-test-statuses/
+ */
+const defaultStatus = {
+  passed: 1,
+  pending: 2,
+  skipped: 4,
+  failed: 5,
+}
+
 async function sendTestResults(testRailInfo, runId, testRailResults) {
   const authorization = getAuthorization(testRailInfo)
   const addResultsUrl = `${testRailInfo.host}/index.php?/api/v2/add_results_for_cases/${runId}`
@@ -39,19 +60,21 @@ async function sendTestResults(testRailInfo, runId, testRailResults) {
 
   debug('TestRail response: %o', json)
 }
+
+const getResultsForCaseUrl = (host, runId, caseId) =>
+    `${host}/index.php?/api/v2/get_results_for_case/${runId}/${caseId}&limit=1`
+const addAttachToResultUrl = (host, resultId) =>
+    `${host}/index.php?/api/v2/add_attachment_to_result/${resultId}`
+
 async function attachScreenshots(testRailInfo, runId, testRailResults) {
-  const getResultsForCaseUrl = (case_id) =>
-      `${testRailInfo.host}/index.php?/api/v2/get_results_for_case/${runId}/${case_id}&limit=1`
-  const addAttachToResultUrl = (result_id) =>
-      `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${result_id}`
   const authorization = getAuthorization(testRailInfo)
   const failedTestsResults = testRailResults.filter(
-      (result) => result.status_id === testRailStatuses.FAILED,
+      (result) => result.status_id === defaultStatus.failed,
   )
 
   for (const testResult of failedTestsResults) {
     const caseId = testResult.case_id
-    const caseResults = await got(getResultsForCaseUrl(caseId), {
+    const caseResults = await got(getResultsForCaseUrl(testRailInfo.host, runId, caseId), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -67,16 +90,16 @@ async function attachScreenshots(testRailInfo, runId, testRailResults) {
         const screenshots = files.filter((file) => file.includes(`${caseId}`))
 
         for (const screenshot of screenshots) {
-          let form = new FormData()
+          const body = new FormData()
 
-          form.append('attachment', fs.createReadStream(`./${screenshot}`))
+          body.append('attachment', fs.createReadStream(`./${screenshot}`))
 
-          const attachResponse = await got(addAttachToResultUrl(resultId), {
+          await got(addAttachToResultUrl(testRailInfo.host, resultId), {
             method: 'POST',
             headers: {
               authorization,
             },
-            body: form,
+            body,
           }).json()
         }
       } catch (err) {
@@ -135,26 +158,6 @@ async function registerPlugin(on, config, skipPlugin = false) {
     const testRailResults = []
 
     results.tests.forEach((result) => {
-      /**
-       *  Cypress to TestRail Status Mapping
-       *
-       *  | Cypress status | TestRail Status | TestRail Status ID |
-       *  | -------------- | --------------- | ------------------ |
-       *  | created        | Untested        | 3                  |
-       *  | Passed         | Passed          | 1                  |
-       *  | Pending        | Blocked         | 2                  |
-       *  | Skipped        | Retest          | 4                  |
-       *  | Failed         | Failed          | 5                  |
-       *
-       *  Each test starts as "Untested" in TestRail.
-       *  @see https://glebbahmutov.com/blog/cypress-test-statuses/
-       */
-      const defaultStatus = {
-        passed: 1,
-        pending: 2,
-        skipped: 4,
-        failed: 5,
-      }
       // override status mapping if defined by user
       const statusOverride = testRailInfo.statusOverride
       const status = {
@@ -199,9 +202,9 @@ function getTestComments(caseId, displayError) {
   try {
     const files = find.fileSync('./cypress/logs/')
     const logs = files.find((file) => file.includes(`${caseId}`))
-    let contents = fs.readFileSync(logs)
-    let jsonContent = JSON.parse(contents)
-    let comment = jsonContent.testCommands.join('\r\n')
+    const contents = fs.readFileSync(logs)
+    const jsonContent = JSON.parse(contents)
+    const comment = jsonContent.testCommands.join('\r\n')
 
     return formatComment(displayError, comment)
   } catch (err) {
