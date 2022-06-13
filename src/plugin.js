@@ -56,7 +56,9 @@ async function sendTestResults(testRailInfo, runId, testRailResults) {
       results: testRailResults,
     },
   }).json()
-  const result = await attachScreenshots(testRailInfo, runId, testRailResults)
+
+  // attach screenshots to test results
+  await attachScreenshots(testRailInfo, runId, testRailResults)
 
   debug('TestRail response: %o', json)
 }
@@ -68,6 +70,7 @@ const addAttachToResultUrl = (host, resultId) =>
 
 async function attachScreenshots(testRailInfo, runId, testRailResults) {
   const authorization = getAuthorization(testRailInfo)
+  // send screenshots only for failed tests
   const failedTestsResults = testRailResults.filter(
       (result) => result.status_id === defaultStatus.failed,
   )
@@ -86,6 +89,7 @@ async function attachScreenshots(testRailInfo, runId, testRailResults) {
       const resultId = result.id
 
       try {
+        // find screenshots for failed test
         const files = find.fileSync('./cypress/screenshots/')
         const screenshots = files.filter((file) => file.includes(`${caseId}`))
 
@@ -94,6 +98,7 @@ async function attachScreenshots(testRailInfo, runId, testRailResults) {
 
           body.append('attachment', fs.createReadStream(`./${screenshot}`))
 
+          // attach screenshot to test result
           await got(addAttachToResultUrl(testRailInfo.host, resultId), {
             method: 'POST',
             headers: {
@@ -178,6 +183,7 @@ async function registerPlugin(on, config, skipPlugin = false) {
         if (caseIds.length && !caseIds.includes(case_id)) {
           debug('case %d is not in test run %d', case_id, runId)
         } else {
+          // if test failed - send error and test command with test results
           if (testRailResult.status_id === defaultStatus.failed ) {
             testRailResult.comment = getTestComments(case_id, result.displayError)
           }
