@@ -29,7 +29,7 @@ module.exports = async (on, config) => {
 
 ## Environment variables
 
-When running the Cypress tests on CI, you need to provide the TestRail server variables through the environment variables. The following variables should be set:
+When running the Cypress tests on CI, you need to provide the TestRail server variables through the [process (OS) environment variables](https://en.wikipedia.org/wiki/Environment_variable). The following variables should be set:
 
 ```
 TESTRAIL_HOST=
