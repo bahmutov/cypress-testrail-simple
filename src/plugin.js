@@ -10,6 +10,7 @@ const {
   getTestRunId,
 } = require('./get-config')
 const { getCasesInTestRun } = require('./testrail-api')
+const { getTestCases } = require('./find-cases')
 
 async function sendTestResults(testRailInfo, runId, testResults) {
   debug(
@@ -109,11 +110,11 @@ async function registerPlugin(on, config, skipPlugin = false) {
         ...defaultStatus,
         ...statusOverride,
       }
-      const testRailCaseReg = /C(\d+)\s/
       // only look at the test name, not at the suite titles
       const testName = result.title[result.title.length - 1]
-      if (testRailCaseReg.test(testName)) {
-        const case_id = parseInt(testRailCaseReg.exec(testName)[1])
+      // there might be multiple test case IDs per test title
+      const testCaseIds = getTestCases(testName)
+      testCaseIds.forEach((case_id) => {
         const status_id = status[result.state] || defaultStatus.failed
         const testRailResult = {
           case_id,
@@ -125,7 +126,7 @@ async function registerPlugin(on, config, skipPlugin = false) {
         } else {
           testRailResults.push(testRailResult)
         }
-      }
+      })
     })
     if (testRailResults.length) {
       console.log('TestRail results in %s', spec.relative)

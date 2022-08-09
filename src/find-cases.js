@@ -6,11 +6,17 @@ const { getTestNames, filterByEffectiveTags } = require('find-test-names')
  * @param {string} testTitle
  */
 function getTestCases(testTitle) {
-  const matches = testTitle.match(/\bC(?<caseId>\d+)\b/)
-  if (!matches) {
-    return
-  }
-  return Number(matches.groups.caseId)
+  const re = /\bC(?<caseId>\d+)\b/g
+  const matches = [...testTitle.matchAll(re)]
+  const ids = matches.map((m) => Number(m.groups.caseId))
+  return uniqueSorted(ids)
+}
+
+/**
+ * Gives an array, removes duplicates and sorts it
+ */
+function uniqueSorted(list) {
+  return Array.from(new Set(list)).sort()
 }
 
 /**
@@ -29,11 +35,13 @@ function findCasesInSpec(spec, readSpec = fs.readFileSync, tagged) {
     testNames = found.testNames
   }
 
-  // a single test case ID per test title for now
-  const ids = testNames.map(getTestCases).filter((id) => !isNaN(id))
+  const ids = testNames
+    .map(getTestCases)
+    .reduce((a, b) => a.concat(b), [])
+    .filter((id) => !isNaN(id))
 
   // make sure the test ids are unique
-  return Array.from(new Set(ids)).sort()
+  return uniqueSorted(ids)
 }
 
 function findCases(specs, readSpec = fs.readFileSync, tagged) {
