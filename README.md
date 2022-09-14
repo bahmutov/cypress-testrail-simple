@@ -17,6 +17,26 @@ $ npm i -D cypress-testrail-simple
 $ yarn add -D cypress-testrail-simple
 ```
 
+### Cypress v10+
+
+Include this plugin from your `cypress.config.js` file E2E (or component tests) Node callback
+
+```js
+// cypress.config.js
+const { defineConfig } = require('cypress')
+
+module.exports = defineConfig({
+  e2e: {
+    // other settings, like baseUrl
+    async setupNodeEvents(on, config) {
+      await require('cypress-testrail-simple/src/plugin')(on, config)
+    },
+  },
+})
+```
+
+### Cypress before v10
+
 Add the plugin to your Cypress plugin file
 
 ```js
