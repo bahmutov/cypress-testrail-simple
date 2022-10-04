@@ -36,6 +36,10 @@ function getTestRailConfig(env = process.env) {
     throw new Error('TESTRAIL_PROJECTID is required.')
   }
 
+  if (!env.TESTRAIL_HOST.startsWith('https://')) {
+    throw new Error(`TESTRAIL_HOST should start with "https://`)
+  }
+
   const testRailInfo = {
     host: process.env.TESTRAIL_HOST,
     username: process.env.TESTRAIL_USERNAME,
@@ -66,7 +70,7 @@ function getTestRunId(config, env = process.env) {
   }
 
   // try to read the test run id from the environment
-  if ('TESTRAIL_RUN_ID' in env) {
+  if ('TESTRAIL_RUN_ID' in env && env.TESTRAIL_RUN_ID) {
     return parseInt(env.TESTRAIL_RUN_ID)
   }
 
