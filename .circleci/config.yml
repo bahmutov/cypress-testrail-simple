@@ -11,6 +11,7 @@ workflows:
     jobs:
       # every testing job needs to install dependencies and Cypress
       - cypress/install:
+          executor: cypress/base-16-14-2-slim
           # instead of building the application
           # or in addition to it, start a new TestRail run
           # and save the run ID in a text file - it will be passed
@@ -29,6 +30,7 @@ workflows:
       - cypress/run:
           requires:
             - cypress/install
+          executor: cypress/base-16-14-2-slim
           # install-command: echo 'Nothing to install in this job'
           # print the file with the TestRail run ID
           install-command: ls -la && cat runId.txt
@@ -54,6 +56,7 @@ workflows:
     jobs:
       - cypress/run:
           name: Test some specs
+          executor: cypress/base-16-14-2-slim
           # instead of building the application
           # or in addition to it, start a new TestRail run
           build: |
