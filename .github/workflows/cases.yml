@@ -17,11 +17,11 @@ jobs:
 
     steps:
       - name: Checkout 🛎
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Install NPM dependencies, cache them correctly
       - name: Install 📦
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v5
         with:
           runTests: false
 
@@ -38,7 +38,7 @@ jobs:
           echo ${runDescription}
 
           runId=$(node ./bin/testrail-start-run.js \
-            --spec 'cypress/integration/spec-b.js' \
+            --spec 'cypress/e2e/spec-b.js' \
             --name "${runName}" \
             --description "${runDescription}")
           echo "TestRail run id ${runId}"
@@ -46,12 +46,12 @@ jobs:
           echo "::set-output name=runId::${runId}"
 
       - name: Cypress tests 🧪
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v5
         with:
           install-command: echo "Already installed"
           record: true
           group: Cases GitHub Actions
-          spec: 'cypress/integration/spec-b.js'
+          spec: 'cypress/e2e/spec-b.js'
         env:
           TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.runId }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
