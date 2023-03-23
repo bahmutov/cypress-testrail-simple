@@ -101,6 +101,7 @@ npx testrail-start-run > runId.txt
 - `--suite` optional suite ID, alias `-s`
 - `--spec` optional [globby](https://github.com/sindresorhus/globby#readme) pattern for finding specs, extracting case IDs (using the `C\d+` regular expression), and starting a new TestRail run with those case IDs only. Alias `-s`. This option is very useful if only some test cases are automated using Cypress. See the workflow examples in [.github/workflows/cases.yml](./.github/workflows/cases.yml) and [.circleci/config.yml](./.circleci/config.yml).
 - `--dry` only parses the arguments and finds the test case IDs, but does not trigger the run
+- `--set-gha-output` sets the created TestRail run id as GitHub Actions output `testRailRunId`
 
 ```
 npx testrail-start-run --name "test run" --description "test run description"

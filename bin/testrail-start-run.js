@@ -8,6 +8,7 @@ const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
 const globby = require('globby')
 const findCypressSpecs = require('find-cypress-specs')
+const ghCore = require('@actions/core')
 const { getTestRailConfig, getAuthorization } = require('../src/get-config')
 const { findCases } = require('../src/find-cases')
 const { getTestSuite } = require('../src/testrail-api')
@@ -25,11 +26,14 @@ const args = arg(
     '--tagged': String,
     // do not open the test run, just find everything
     '--dry': Boolean,
+    // set run id as GitHub Actions output
+    '--set-gha-output': Boolean,
     // aliases
     '-s': '--spec',
     '-n': '--name',
     '-d': '--description',
     '-st': '--suite',
+    '-gha': '--set-gha-output',
   },
   { permissive: true },
 )
@@ -47,7 +51,13 @@ function findSpecs(pattern) {
   })
 }
 
-async function startRun({ testRailInfo, name, description, caseIds }) {
+async function startRun({
+  testRailInfo,
+  name,
+  description,
+  caseIds,
+  setGitHubActionsOutput,
+}) {
   // only output the run ID to the STDOUT, everything else is logged to the STDERR
   console.error(
     'creating new TestRail run for project %s',
@@ -104,6 +114,11 @@ async function startRun({ testRailInfo, name, description, caseIds }) {
         debug('response from the add_run')
         debug('%o', json)
         console.log(json.id)
+
+        if (setGitHubActionsOutput) {
+          ghCore.setOutput('testRailRunId', json.id)
+          debug('set GHA output %s %s', 'testRailRunId', json.id)
+        }
       },
       (error) => {
         console.error('Could not create a new TestRail run')
@@ -137,7 +152,13 @@ if (args['--find-specs']) {
     console.log('Dry run, not starting a new run')
   } else {
     const testRailInfo = getTestRailConfig()
-    startRun({ testRailInfo, name, description, caseIds })
+    startRun({
+      testRailInfo,
+      name,
+      description,
+      caseIds,
+      setGitHubActionsOutput: args['--set-gha-output'],
+    })
   }
 } else if (args['--spec']) {
   findSpecs(args['--spec']).then((specs) => {
@@ -147,11 +168,22 @@ if (args['--find-specs']) {
     debug('found %d TestRail case ids: %o', caseIds.length, caseIds)
 
     const testRailInfo = getTestRailConfig()
-    startRun({ testRailInfo, name, description, caseIds })
+    startRun({
+      testRailInfo,
+      name,
+      description,
+      caseIds,
+      setGitHubActionsOutput: args['--set-gha-output'],
+    })
   })
 } else {
   const testRailInfo = getTestRailConfig()
   // start a new test run for all test cases
   // @ts-ignore
-  startRun({ testRailInfo, name, description })
+  startRun({
+    testRailInfo,
+    name,
+    description,
+    setGitHubActionsOutput: args['--set-gha-output'],
+  })
 }
