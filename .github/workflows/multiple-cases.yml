@@ -18,11 +18,11 @@ jobs:
 
     steps:
       - name: Checkout 🛎
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Install NPM dependencies, cache them correctly
       - name: Install 📦
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@v5
         with:
           runTests: false
 
@@ -47,7 +47,7 @@ jobs:
           echo "::set-output name=runId::${runId}"
 
       - name: Cypress tests 🧪
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@v5
         with:
           install-command: echo "Already installed"
           record: true

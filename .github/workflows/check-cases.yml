@@ -18,7 +18,7 @@ jobs:
 
       # Install NPM dependencies, cache them correctly
       - name: Install 📦
-        uses: cypress-io/github-action@v3
+        uses: cypress-io/github-action@v5
         with:
           runTests: false
 
