@@ -59,7 +59,7 @@ jobs:
           record: true
           group: Find Cases
           # the test tagged @a is only in the spec-a.js
-          spec: cypress/integration/spec-a.js
+          spec: cypress/e2e/spec-a.js
         env:
           TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.runId }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}

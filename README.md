@@ -114,7 +114,7 @@ For readability, you can split the command across multiple lines usually
 npx testrail-start-run \
   --name "test run" \
   --description "test run description" \
-  --spec "cypress/integration/featureA/**.js"
+  --spec "cypress/e2e/featureA/**.js"
 ```
 
 #### --find-specs
@@ -276,7 +276,7 @@ This tool uses [debug](https://github.com/visionmedia/debug#readme) to output ve
 To start a new test rail run locally and see how the new run is created
 
 ```
-$ as-a . node ./bin/testrail-start-run.js --spec 'cypress/integration/\*.js'
+$ as-a . node ./bin/testrail-start-run.js --spec 'cypress/e2e/\*.js'
 ```
 
 Make sure this plugin is registered correctly in your `cypress/plugins/index.js` file and the plugin function is declared with the `async` keyword in v3. During the test run, you should see messages like this after each spec

@@ -39,7 +39,7 @@ jobs:
           echo ${runDescription}
 
           runId=$(node ./bin/testrail-start-run.js \
-            --spec 'cypress/integration/spec-c.js' \
+            --spec 'cypress/e2e/spec-c.js' \
             --name "${runName}" \
             --description "${runDescription}")
           echo "TestRail run id ${runId}"
@@ -52,7 +52,7 @@ jobs:
           install-command: echo "Already installed"
           record: true
           group: Cases GitHub Actions
-          spec: 'cypress/integration/spec-c.js'
+          spec: 'cypress/e2e/spec-c.js'
         env:
           TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.runId }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
