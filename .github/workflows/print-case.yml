@@ -1,0 +1,29 @@
+name: print-case
+on: [push]
+jobs:
+  tests:
+    runs-on: ubuntu-20.04
+    env:
+      # pass TestRail settings from the project secrets
+      # via environment variables
+      TESTRAIL_HOST: ${{secrets.TESTRAIL_HOST}}
+      TESTRAIL_USERNAME: ${{secrets.TESTRAIL_USERNAME}}
+      TESTRAIL_PASSWORD: ${{secrets.TESTRAIL_PASSWORD}}
+      # the project ID is not that secret
+      TESTRAIL_PROJECTID: 1
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v3
+
+      # Install NPM dependencies, cache them correctly
+      - name: Install 📦
+        uses: cypress-io/github-action@v5
+        with:
+          runTests: false
+
+      - name: Print case information 🖨️
+        run: |
+          npm run print-case
+        env:
+          DEBUG: cypress-testrail-simple

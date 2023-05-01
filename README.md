@@ -264,6 +264,14 @@ $ npx cypress run --env testRailRunId=635
 
 - read it from the text file `runId.txt` (written there by the `testrail-start-run` script)
 
+## Print test case information
+
+Use the script "testrail-print-case"
+
+```
+$ npx testrail-print-case --case <test case id>
+```
+
 ## Examples
 
 - [bahmutov/test-rail-example](https://github.com/bahmutov/test-rail-example)
