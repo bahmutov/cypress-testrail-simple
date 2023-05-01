@@ -11,7 +11,8 @@
     "testrail-close-run": "bin/testrail-close-run.js",
     "testrail-start-run": "bin/testrail-start-run.js",
     "testrail-check-case-ids": "bin/testrail-check-case-ids.js",
-    "testrail-run-results": "bin/testrail-run-results.js"
+    "testrail-run-results": "bin/testrail-run-results.js",
+    "testrail-print-case": "bin/testrail-print-case.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

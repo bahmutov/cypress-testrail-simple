@@ -4,6 +4,8 @@
 
 const arg = require('arg')
 const debug = require('debug')('cypress-testrail-simple')
+const { getTestRailConfig } = require('../src/get-config')
+const { getCase } = require('../src/get-case')
 
 const args = arg(
   {
@@ -21,7 +23,19 @@ if (!args['--case']) {
   process.exit(1)
 }
 
+// remove leading "C" from the test case ID
 const caseId = args['--case'].startsWith('C')
-  ? args['--case']
-  : 'C' + args['--case']
+  ? args['--case'].slice(1)
+  : args['--case']
 console.log('looking for TestRail Case %s', caseId)
+
+const testRailInfo = getTestRailConfig()
+
+getCase({ testRailInfo, caseId })
+  .then((info) => {
+    console.log(info)
+  })
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
