@@ -47,6 +47,8 @@
     "@actions/core": "^1.10.0",
     "arg": "^5.0.1",
     "debug": "^4.3.2",
+    "find": "^0.3.0",
+    "form-data": "^4.0.0",
     "find-cypress-specs": "^1.31.3",
     "find-test-names": "^1.28.3",
     "globby": "^11",
