@@ -2,3 +2,4 @@ node_modules/
 .as-a.ini
 cypress/screenshots/
 cypress/videos/
+.idea
