@@ -1,4 +1,4 @@
-name: check-cases
+name: print-case
 on: [push]
 jobs:
   tests:
@@ -22,10 +22,8 @@ jobs:
         with:
           runTests: false
 
-      # verify that all case IDs in the spec files are valid
-      # for this TestRail project
-      - name: Check case IDs 🔎
+      - name: Print case information 🖨️
         run: |
-          runId=$(node ./bin/testrail-check-case-ids.js --find-specs)
+          npm run print-case
         env:
           DEBUG: cypress-testrail-simple

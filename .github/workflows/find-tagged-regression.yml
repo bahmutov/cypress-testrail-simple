@@ -20,11 +20,11 @@ jobs:
 
     steps:
       - name: Checkout 🛎
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Install NPM dependencies, cache them correctly
       - name: Install 📦
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v5
         with:
           runTests: false
 
@@ -40,36 +40,34 @@ jobs:
           echo ${runName}
           echo ${runDescription}
 
-          runId=$(node ./bin/testrail-start-run.js \
+          node ./bin/testrail-start-run.js \
             --find-specs --tagged @regression \
             --name "${runName}" \
-            --description "${runDescription}")
-          echo "TestRail run id ${runId}"
-          # save the run ID as the output from this step
-          echo "::set-output name=runId::${runId}"
+            --description "${runDescription}" \
+            --set-gha-output
 
       - name: Print TestRail run results 📋
         if: ${{ always() }}
         run: |
-          node ./bin/testrail-run-results.js --run ${{ steps.testRail.outputs.runId }}
+          node ./bin/testrail-run-results.js --run ${{ steps.testRail.outputs.testRailRunId }}
 
       - name: Cypress tests 🧪
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v5
         with:
           install-command: echo "Already installed"
           record: true
           group: Regression cases
         env:
-          TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.runId }}
+          TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.testRailRunId }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
       - name: Print TestRail run results 📋
         if: ${{ always() }}
         run: |
-          node ./bin/testrail-run-results.js --run ${{ steps.testRail.outputs.runId }}
+          node ./bin/testrail-run-results.js --run ${{ steps.testRail.outputs.testRailRunId }}
 
       - name: Close TestRail Run 🏁
         # always close the test run, even if the previous steps have failed
         if: ${{ always() }}
         run: |
-          node ./bin/testrail-close-run.js ${{ steps.testRail.outputs.runId }}
+          node ./bin/testrail-close-run.js ${{ steps.testRail.outputs.testRailRunId }}

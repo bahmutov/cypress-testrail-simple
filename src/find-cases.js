@@ -2,6 +2,24 @@ const fs = require('fs')
 const { getTestNames, filterByEffectiveTags } = require('find-test-names')
 
 /**
+ * Returns the TestRail case id number (if any) from the given full test title
+ * @param {string} testTitle
+ */
+function getTestCases(testTitle) {
+  const re = /\bC(?<caseId>\d+)\b/g
+  const matches = [...testTitle.matchAll(re)]
+  const ids = matches.map((m) => Number(m.groups.caseId))
+  return uniqueSorted(ids)
+}
+
+/**
+ * Gives an array, removes duplicates and sorts it
+ */
+function uniqueSorted(list) {
+  return Array.from(new Set(list)).sort()
+}
+
+/**
  * Finds the test case IDs in the test titles.
  * @example "C101: Test case title" => "101"
  */
@@ -17,19 +35,13 @@ function findCasesInSpec(spec, readSpec = fs.readFileSync, tagged) {
     testNames = found.testNames
   }
 
-  // a single test case ID per test title for now
   const ids = testNames
-    .map((testName) => {
-      const matches = testName.match(/\bC(?<caseId>\d+)\b/)
-      if (!matches) {
-        return
-      }
-      return Number(matches.groups.caseId)
-    })
+    .map(getTestCases)
+    .reduce((a, b) => a.concat(b), [])
     .filter((id) => !isNaN(id))
 
   // make sure the test ids are unique
-  return Array.from(new Set(ids)).sort()
+  return uniqueSorted(ids)
 }
 
 function findCases(specs, readSpec = fs.readFileSync, tagged) {
@@ -42,4 +54,4 @@ function findCases(specs, readSpec = fs.readFileSync, tagged) {
   return uniqueCaseIds
 }
 
-module.exports = { findCases, findCasesInSpec }
+module.exports = { findCases, getTestCases, findCasesInSpec }

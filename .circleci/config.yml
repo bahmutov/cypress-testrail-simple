@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   # https://github.com/cypress-io/circleci-orb
-  cypress: cypress-io/cypress@2.0.0
+  cypress: cypress-io/cypress@2.2.0
 
 # setting environment variables on CircleCI
 # https://circleci.com/docs/2.0/env-vars/
@@ -11,6 +11,7 @@ workflows:
     jobs:
       # every testing job needs to install dependencies and Cypress
       - cypress/install:
+          executor: cypress/base-16-14-2-slim
           # instead of building the application
           # or in addition to it, start a new TestRail run
           # and save the run ID in a text file - it will be passed
@@ -29,6 +30,7 @@ workflows:
       - cypress/run:
           requires:
             - cypress/install
+          executor: cypress/base-16-14-2-slim
           # install-command: echo 'Nothing to install in this job'
           # print the file with the TestRail run ID
           install-command: ls -la && cat runId.txt
@@ -54,11 +56,12 @@ workflows:
     jobs:
       - cypress/run:
           name: Test some specs
+          executor: cypress/base-16-14-2-slim
           # instead of building the application
           # or in addition to it, start a new TestRail run
           build: |
             runId=$(node ./bin/testrail-start-run.js \
-              --spec "cypress/integration/spec-a.js" \
+              --spec "cypress/e2e/spec-a.js" \
               "Testing on Circle workflow ${CIRCLE_WORKFLOW_ID}" \
               "Cypress tests on CircleCI ${CIRCLE_BUILD_URL}")
             echo "TestRail run id ${runId}"
@@ -67,7 +70,7 @@ workflows:
             cat runId.txt
           record: true
           group: CircleCI Some Specs
-          spec: 'cypress/integration/spec-a.js'
+          spec: 'cypress/e2e/spec-a.js'
           # this is the only job in the workflow, no need to save the files
           no-workspace: true
           # Try to close the TestRail run using job's post-steps

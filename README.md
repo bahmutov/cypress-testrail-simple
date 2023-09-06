@@ -1,6 +1,6 @@
 # cypress-testrail-simple
 
-[![cypress-testrail-simple](https://img.shields.io/endpoint?url=https://dashboard.cypress.io/badge/simple/41cgid/main&style=flat&logo=cypress)](https://dashboard.cypress.io/projects/41cgid/runs) [![ci](https://github.com/bahmutov/cypress-testrail-simple/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bahmutov/cypress-testrail-simple/actions/workflows/ci.yml) [![CircleCI](https://circleci.com/gh/bahmutov/cypress-testrail-simple/tree/main.svg?style=svg)](https://circleci.com/gh/bahmutov/cypress-testrail-simple/tree/main) ![cypress version](https://img.shields.io/badge/cypress-9.7.0-brightgreen) [![renovate-app badge][renovate-badge]][renovate-app]
+[![cypress-testrail-simple](https://img.shields.io/endpoint?url=https://dashboard.cypress.io/badge/simple/41cgid/main&style=flat&logo=cypress)](https://dashboard.cypress.io/projects/41cgid/runs) [![ci](https://github.com/bahmutov/cypress-testrail-simple/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bahmutov/cypress-testrail-simple/actions/workflows/ci.yml) [![CircleCI](https://circleci.com/gh/bahmutov/cypress-testrail-simple/tree/main.svg?style=svg)](https://circleci.com/gh/bahmutov/cypress-testrail-simple/tree/main) ![cypress version](https://img.shields.io/badge/cypress-13.1.0-brightgreen) [![renovate-app badge][renovate-badge]][renovate-app]
 
 > Simple upload of Cypress test results to TestRail
 
@@ -17,6 +17,26 @@ $ npm i -D cypress-testrail-simple
 $ yarn add -D cypress-testrail-simple
 ```
 
+### Cypress v10+
+
+Include this plugin from your `cypress.config.js` file E2E (or component tests) Node callback
+
+```js
+// cypress.config.js
+const { defineConfig } = require('cypress')
+
+module.exports = defineConfig({
+  e2e: {
+    // other settings, like baseUrl
+    async setupNodeEvents(on, config) {
+      await require('cypress-testrail-simple/src/plugin')(on, config)
+    },
+  },
+})
+```
+
+### Cypress before v10
+
 Add the plugin to your Cypress plugin file
 
 ```js
@@ -29,7 +49,7 @@ module.exports = async (on, config) => {
 
 ## Environment variables
 
-When running the Cypress tests on CI, you need to provide the TestRail server variables through the environment variables. The following variables should be set:
+When running the Cypress tests on CI, you need to provide the TestRail server variables through the [process (OS) environment variables](https://en.wikipedia.org/wiki/Environment_variable). The following variables should be set:
 
 ```
 TESTRAIL_HOST=
@@ -81,6 +101,7 @@ npx testrail-start-run > runId.txt
 - `--suite` optional suite ID, alias `-s`
 - `--spec` optional [globby](https://github.com/sindresorhus/globby#readme) pattern for finding specs, extracting case IDs (using the `C\d+` regular expression), and starting a new TestRail run with those case IDs only. Alias `-s`. This option is very useful if only some test cases are automated using Cypress. See the workflow examples in [.github/workflows/cases.yml](./.github/workflows/cases.yml) and [.circleci/config.yml](./.circleci/config.yml).
 - `--dry` only parses the arguments and finds the test case IDs, but does not trigger the run
+- `--set-gha-output` sets the created TestRail run id as GitHub Actions output `testRailRunId`
 
 ```
 npx testrail-start-run --name "test run" --description "test run description"
@@ -93,7 +114,7 @@ For readability, you can split the command across multiple lines usually
 npx testrail-start-run \
   --name "test run" \
   --description "test run description" \
-  --spec "cypress/integration/featureA/**.js"
+  --spec "cypress/e2e/featureA/**.js"
 ```
 
 #### --find-specs
@@ -243,6 +264,14 @@ $ npx cypress run --env testRailRunId=635
 
 - read it from the text file `runId.txt` (written there by the `testrail-start-run` script)
 
+## Print test case information
+
+Use the script "testrail-print-case"
+
+```
+$ npx testrail-print-case --case <test case id>
+```
+
 ## Examples
 
 - [bahmutov/test-rail-example](https://github.com/bahmutov/test-rail-example)
@@ -255,7 +284,7 @@ This tool uses [debug](https://github.com/visionmedia/debug#readme) to output ve
 To start a new test rail run locally and see how the new run is created
 
 ```
-$ as-a . node ./bin/testrail-start-run.js --spec 'cypress/integration/\*.js'
+$ as-a . node ./bin/testrail-start-run.js --spec 'cypress/e2e/\*.js'
 ```
 
 Make sure this plugin is registered correctly in your `cypress/plugins/index.js` file and the plugin function is declared with the `async` keyword in v3. During the test run, you should see messages like this after each spec

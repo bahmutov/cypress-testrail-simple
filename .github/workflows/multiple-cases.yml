@@ -1,6 +1,6 @@
-# starts a new TestRail run
-# finds the Cypress specs
-name: find-specs
+# starts a new TestRail run but with test cases from some specs only
+# the test title has multiple test case IDs
+name: multiple cases
 on: [push]
 jobs:
   tests:
@@ -32,37 +32,28 @@ jobs:
       - name: Start TestRail Run 🏃🏻‍♂️
         id: testRail
         run: |
-          runName="Testing cases on GitHub Actions workflow find specs"
+          runName="Testing multiple test cases in the title"
           runDescription="Cypress tests for commit ${GITHUB_SHA} ${GITHUB_REF}"
 
           echo ${runName}
           echo ${runDescription}
 
           node ./bin/testrail-start-run.js \
-            --find-specs \
+            --spec 'cypress/e2e/spec-c.js' \
             --name "${runName}" \
             --description "${runDescription}" \
             --set-gha-output
-
-      - name: Print TestRail run results 📋
-        if: ${{ always() }}
-        run: |
-          node ./bin/testrail-run-results.js --run ${{ steps.testRail.outputs.testRailRunId }}
 
       - name: Cypress tests 🧪
         uses: cypress-io/github-action@v5
         with:
           install-command: echo "Already installed"
           record: true
-          group: Find Cases
+          group: Cases GitHub Actions
+          spec: 'cypress/e2e/spec-c.js'
         env:
           TESTRAIL_RUN_ID: ${{ steps.testRail.outputs.testRailRunId }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-
-      - name: Print TestRail run results 📋
-        if: ${{ always() }}
-        run: |
-          node ./bin/testrail-run-results.js --run ${{ steps.testRail.outputs.testRailRunId }}
 
       - name: Close TestRail Run 🏁
         # always close the test run, even if the previous steps have failed

@@ -104,4 +104,30 @@ describe('Finding test case IDs', () => {
     const ids = findCasesInSpec(filename, readFile)
     expect(ids, 'test cases').to.deep.equal([1, 2, 3])
   })
+
+  it('supports multiple test cases per title', () => {
+    const source = `
+      it('C303 works C101 C202', () => {})
+    `
+    const readFile = cy.stub().returns(source)
+    const filename = 'test-spec.js'
+    const ids = findCasesInSpec(filename, readFile)
+    // output is sorted
+    expect(ids, 'test cases').to.deep.equal([101, 202, 303])
+  })
+
+  it('supports multiple test cases', () => {
+    const source = `
+      it('C303 works C101 C202', () => {})
+
+      it('C101 C202 loads', () => {})
+
+      it('C303 completes', () => {})
+    `
+    const readFile = cy.stub().returns(source)
+    const filename = 'test-spec.js'
+    const ids = findCasesInSpec(filename, readFile)
+    // output is sorted
+    expect(ids, 'test cases').to.deep.equal([101, 202, 303])
+  })
 })

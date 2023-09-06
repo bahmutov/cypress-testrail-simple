@@ -11,12 +11,14 @@
     "testrail-close-run": "bin/testrail-close-run.js",
     "testrail-start-run": "bin/testrail-start-run.js",
     "testrail-check-case-ids": "bin/testrail-check-case-ids.js",
-    "testrail-run-results": "bin/testrail-run-results.js"
+    "testrail-run-results": "bin/testrail-run-results.js",
+    "testrail-print-case": "bin/testrail-print-case.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "semantic-release": "semantic-release",
-    "format": "prettier --write '{cypress,src,bin}/**/*.js'"
+    "format": "prettier --write '{cypress,src,bin}/**/*.js'",
+    "print-case": "node ./bin/testrail-print-case.js --case 15"
   },
   "repository": {
     "type": "git",
@@ -37,18 +39,16 @@
   "homepage": "https://github.com/bahmutov/cypress-testrail-simple#readme",
   "devDependencies": {
     "console.table": "^0.10.0",
-    "cypress": "9.7.0",
+    "cypress": "13.1.0",
     "prettier": "^2.5.1",
     "semantic-release": "^18.0.0"
   },
   "dependencies": {
+    "@actions/core": "^1.10.0",
     "arg": "^5.0.1",
     "debug": "^4.3.2",
-    "find": "^0.3.0",
-    "form-data": "^4.0.0",
-    "fs": "^0.0.1-security",
-    "find-cypress-specs": "^1.17.0",
-    "find-test-names": "^1.17.1",
+    "find-cypress-specs": "^1.31.3",
+    "find-test-names": "^1.28.3",
     "globby": "^11",
     "got": "^11.8.2"
   },
