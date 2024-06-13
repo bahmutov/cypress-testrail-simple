@@ -83,51 +83,54 @@ async function registerPlugin(on, config, skipPlugin = false) {
 
     // find only the tests with TestRail case id in the test name
     const testRailResults = []
-    results.tests.forEach((result) => {
-      /**
-       *  Cypress to TestRail Status Mapping
-       *
-       *  | Cypress status | TestRail Status | TestRail Status ID |
-       *  | -------------- | --------------- | ------------------ |
-       *  | created        | Untested        | 3                  |
-       *  | Passed         | Passed          | 1                  |
-       *  | Pending        | Blocked         | 2                  |
-       *  | Skipped        | Retest          | 4                  |
-       *  | Failed         | Failed          | 5                  |
-       *
-       *  Each test starts as "Untested" in TestRail.
-       *  @see https://glebbahmutov.com/blog/cypress-test-statuses/
-       */
-      const defaultStatus = {
-        passed: 1,
-        pending: 2,
-        skipped: 4,
-        failed: 5,
-      }
-      // override status mapping if defined by user
-      const statusOverride = testRailInfo.statusOverride
-      const status = {
-        ...defaultStatus,
-        ...statusOverride,
-      }
-      // only look at the test name, not at the suite titles
-      const testName = result.title[result.title.length - 1]
-      // there might be multiple test case IDs per test title
-      const testCaseIds = getTestCases(testName)
-      testCaseIds.forEach((case_id) => {
-        const status_id = status[result.state] || defaultStatus.failed
-        const testRailResult = {
-          case_id,
-          status_id,
+    if (results.tests) {
+      results.tests.forEach((result) => {
+        /**
+         *  Cypress to TestRail Status Mapping
+         *
+         *  | Cypress status | TestRail Status | TestRail Status ID |
+         *  | -------------- | --------------- | ------------------ |
+         *  | created        | Untested        | 3                  |
+         *  | Passed         | Passed          | 1                  |
+         *  | Pending        | Blocked         | 2                  |
+         *  | Skipped        | Retest          | 4                  |
+         *  | Failed         | Failed          | 5                  |
+         *
+         *  Each test starts as "Untested" in TestRail.
+         *  @see https://glebbahmutov.com/blog/cypress-test-statuses/
+         */
+        const defaultStatus = {
+          passed: 1,
+          pending: 2,
+          skipped: 4,
+          failed: 5,
         }
-
-        if (caseIds.length && !caseIds.includes(case_id)) {
-          debug('case %d is not in test run %d', case_id, runId)
-        } else {
-          testRailResults.push(testRailResult)
+        // override status mapping if defined by user
+        const statusOverride = testRailInfo.statusOverride
+        const status = {
+          ...defaultStatus,
+          ...statusOverride,
         }
+        // only look at the test name, not at the suite titles
+        const testName = result.title[result.title.length - 1]
+        // there might be multiple test case IDs per test title
+        const testCaseIds = getTestCases(testName)
+        testCaseIds.forEach((case_id) => {
+          const status_id = status[result.state] || defaultStatus.failed
+          const testRailResult = {
+            case_id,
+            status_id,
+          }
+  
+          if (caseIds.length && !caseIds.includes(case_id)) {
+            debug('case %d is not in test run %d', case_id, runId)
+          } else {
+            testRailResults.push(testRailResult)
+          }
+        })
       })
-    })
+    }
+    
     if (testRailResults.length) {
       console.log('TestRail results in %s', spec.relative)
       console.table(testRailResults)
