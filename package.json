@@ -39,7 +39,7 @@
   "homepage": "https://github.com/bahmutov/cypress-testrail-simple#readme",
   "devDependencies": {
     "console.table": "^0.10.0",
-    "cypress": "14.0.2",
+    "cypress": "14.0.3",
     "prettier": "^2.5.1",
     "semantic-release": "^18.0.0"
   },
