@@ -24,7 +24,7 @@ jobs:
 
       # Install NPM dependencies, cache them correctly
       - name: Install 📦
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v7.4.0
         with:
           runTests: false
 
@@ -52,7 +52,7 @@ jobs:
           node ./bin/testrail-run-results.js --run ${{ steps.testRail.outputs.testRailRunId }}
 
       - name: Cypress tests 🧪
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v7.4.0
         with:
           install-command: echo "Already installed"
           record: true
